@@ -53,7 +53,7 @@ function game() {
 	document.getElementById("score").innerHTML = "Score: " + tail;
 }
 
-canv.addEventListener('touchstart', function(e){
+gc.addEventListener('touchstart', function(e){
 mobile = true;
 var touchobj = e.changedTouches[0];
 var mx = parseInt(touchobj.clientX);
