@@ -49,7 +49,7 @@ function game() {
 	ctx.fillRect(ax*gs,ay*gs,gs-2,gs-2);
 }
 
- canv.onclick = function pressed(event){
+function pressed(event){
    var mx = event.clientX;
    var my = event.clientY;
   if(mx > 200 && xv ==0){
