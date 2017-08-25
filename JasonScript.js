@@ -67,7 +67,7 @@ function game() {
 	trail.shift();
 	}
 
-	if(ax==px && ay==py) {
+	if(ax==trail[0] && ay==trail[0]) {
 		tail++;
 		ax=Math.floor(Math.random()*tc);
 		ay=Math.floor(Math.random()*tc);
