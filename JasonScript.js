@@ -6,8 +6,7 @@ window.onload=function() {
 px=py=10;
 gs=tc=20;
 ax=ay=15;
-xv=1;
-yv=0;
+xv=yv=0;
 trail=[];
 tail = 1;
 function game() {
@@ -60,12 +59,12 @@ function pressed(event){
     yv=0;
     xv=-1;
   }
-  /*if(my > 200 && yv ==0){
+  if(my > 200 && yv ==0){
     yv=1;
     xv=0;
   }
   if(my < 200 && yv ==0){
     yv=-1;
     xv=0;
-  }*/
+  }
 }
