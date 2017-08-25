@@ -4,10 +4,19 @@
 <head>
 <title>Snake</title>
 </head>
-  
+
 <body>
-<canvas id = "cv"></canvas>
+
+  <h1 onclick="changeText(this)">Click on this text!</h1>
+  
+  <script>
+  function changeText(id) {
+      id.innerHTML = "Ooops!";
+  }
+  </script>
+
+<canvas id = "canvas"></canvas>
   <script src = "JasonScript.js"> </script>
 </body>
-  
-</html> 
+
+</html>
