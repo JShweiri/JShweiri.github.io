@@ -23,7 +23,6 @@ if(mobile){
     yv=-1;
     xv=0;
   }
-moved = true;
 }
 	}, false)
 
@@ -75,10 +74,10 @@ function game() {
 	ctx.fillRect(ax*gs,ay*gs,gs-2,gs-2);
 }
 
+if(!mobile){
 gc.onclick = function pressed(event){
    var mx = event.clientX;
    var my = event.clientY;
-	 if(!mobile){
   if(mx > 200 && xv ==0){
     yv=0;
     xv=1;
@@ -95,6 +94,5 @@ gc.onclick = function pressed(event){
     yv=-1;
     xv=0;
   }
-	moved = true;
 }
 }
