@@ -1,6 +1,8 @@
 var mobile =false;
 window.onload=function() {
 	canv=document.getElementById("gc");
+	canv.width=(gs*tc);
+	canv.height=(gs*tc);
 	canv.addEventListener('touchstart', function(e){
 	mobile = true;
 	var touchobj = e.changedTouches[0];
@@ -51,7 +53,7 @@ function game() {
 		py= 0;
 	}
 	ctx.fillStyle="black";
-	ctx.fillRect(0,0,canv.width,canv.height);
+	ctx.fillRect(0,0,gs*tc,gs*tc);
 
 	ctx.fillStyle="cyan";
 	for(var i=0;i<trail.length;i++) {
@@ -79,19 +81,19 @@ gc.onclick = function pressed(event){
    var mx = event.clientX;
    var my = event.clientY;
 	 if(!mobile){
-  if(mx > 200 && xv ==0){
+  if(mx > (gs*tc)/2.0 && xv ==0){
     yv=0;
     xv=1;
   }
-  else if(mx < 200 && xv ==0){
+  else if(mx < (gs*tc)/2.0 && xv ==0){
     yv=0;
     xv=-1;
   }
-  else if(my > 200 && yv ==0){
+  else if(my > (gs*tc)/2.0 && yv ==0){
     yv=1;
     xv=0;
   }
-  else if(my < 200 && yv ==0){
+  else if(my < (gs*tc)/2.0 && yv ==0){
     yv=-1;
     xv=0;
   }
