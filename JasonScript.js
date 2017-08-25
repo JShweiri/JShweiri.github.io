@@ -74,7 +74,7 @@ function game() {
 	}
 	ctx.fillStyle="yellow";
 	ctx.fillRect(ax*gs,ay*gs,gs-2,gs-2);
-	document.getElementById("score").innerHTML = "Score" + tail;
+	document.getElementById("score").innerHTML = "Score: " + (tail-1);
 }
 
 
