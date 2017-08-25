@@ -1,4 +1,12 @@
 var mobile =false;
+px=py=10;
+gs=tc=25;
+ax=ay=15;
+xv=yv=0;
+trail=[];
+tail = 0;
+
+
 window.onload=function() {
 	canv=document.getElementById("gc");
 	canv.width=(gs*tc);
@@ -6,12 +14,6 @@ window.onload=function() {
 	ctx=canv.getContext("2d");
 	setInterval(game,1000/5);
 }
-px=py=10;
-gs=tc=25;
-ax=ay=15;
-xv=yv=0;
-trail=[];
-tail = 0;
 function game() {
 	px+=xv;
 	py+=yv;
