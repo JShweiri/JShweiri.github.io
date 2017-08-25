@@ -9,19 +9,19 @@ window.onload=function() {
 	var mx = parseInt(touchobj.clientX);
 	var my = parseInt(touchobj.clientY);
 if(mobile){
-	if(mx > 200 && xv ==0){
+	if(mx > (gs*tc)/2.0 && xv ==0){
     yv=0;
     xv=1;
   }
-  else if(mx < 200 && xv ==0){
+  else if(mx < (gs*tc)/2.0 && xv ==0){
     yv=0;
     xv=-1;
   }
-  else if(my > 200 && yv ==0){
+  else if(my > (gs*tc)/2.0 && yv ==0){
     yv=1;
     xv=0;
   }
-  else if(my < 200 && yv ==0){
+  else if(my < (gs*tc)/2.0 && yv ==0){
     yv=-1;
     xv=0;
   }
