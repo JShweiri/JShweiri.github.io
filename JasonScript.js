@@ -56,6 +56,7 @@ function game() {
 	ctx.fillRect(0,0,gs*tc,gs*tc);
 
 	ctx.fillStyle="cyan";
+	ctx.fillRect(px*gs,py*gs,gs-2,gs-2);
 	for(var i=0;i<trail.length;i++) {
 		ctx.fillRect(trail[i].x*gs,trail[i].y*gs,gs-2,gs-2);
 		if(trail[i].x==px && trail[i].y==py) {
@@ -67,7 +68,7 @@ function game() {
 	trail.shift();
 	}
 
-	if(ax==trail[0] && ay==trail[0]) {
+	if(ax==px && ay==py) {
 		tail++;
 		ax=Math.floor(Math.random()*tc);
 		ay=Math.floor(Math.random()*tc);
