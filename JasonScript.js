@@ -1,6 +1,6 @@
 
 window.onload=function(){
-var canv = document.getElementById("canvas");
+var canv = document.getElementById("cv");
 canv.addEventListener("onclick", pressed);
 var ctx = canv.getContext("2d");
 setInterval(game, 1000/15);
