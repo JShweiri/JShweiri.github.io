@@ -31,7 +31,7 @@ function game() {
 	for(var i=0;i<trail.length;i++) {
 		ctx.fillRect(trail[i].x*gs,trail[i].y*gs,gs-2,gs-2);
 		if(trail[i].x==px && trail[i].y==py) {
-			tail = 5;
+			tail = 1;
 		}
 	}
 	trail.push({x:px,y:py});
@@ -55,15 +55,15 @@ function pressed(event){
     yv=0;
     xv=1;
   }
-  if(mx < 200 && xv ==0){
+  else if(mx < 200 && xv ==0){
     yv=0;
     xv=-1;
   }
-  if(my > 200 && yv ==0){
+  else if(my > 200 && yv ==0){
     yv=1;
     xv=0;
   }
-  if(my < 200 && yv ==0){
+  else if(my < 200 && yv ==0){
     yv=-1;
     xv=0;
   }
