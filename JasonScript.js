@@ -47,10 +47,31 @@ function game() {
 	ctx.fillStyle="yellow";
 	ctx.fillRect(ax*gs,ay*gs,gs-2,gs-2);
 }
-
+/*
 gc.onclick = function pressed(event){
    var mx = event.clientX;
    var my = event.clientY;
+  if(mx > 200 && xv ==0){
+    yv=0;
+    xv=1;
+  }
+  else if(mx < 200 && xv ==0){
+    yv=0;
+    xv=-1;
+  }
+  else if(my > 200 && yv ==0){
+    yv=1;
+    xv=0;
+  }
+  else if(my < 200 && yv ==0){
+    yv=-1;
+    xv=0;
+  }
+}
+*/
+gc.touchstart = function tooched(event){
+   var mx = event.touches[0].screenX;
+   var my = event.touches[0].screenY;
   if(mx > 200 && xv ==0){
     yv=0;
     xv=1;
