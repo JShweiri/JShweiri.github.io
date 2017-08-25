@@ -1,10 +1,11 @@
+var moved =false;
 window.onload=function() {
 	canv=document.getElementById("gc");
 	canv.addEventListener('touchstart', function(e){
 	var touchobj = e.changedTouches[0];
 	var mx = parseInt(touchobj.clientX);
 	var my = parseInt(touchobj.clientY);
-
+if(!moved){
 	if(mx > 200 && xv ==0){
     yv=0;
     xv=1;
@@ -21,7 +22,8 @@ window.onload=function() {
     yv=-1;
     xv=0;
   }
-
+moved = true;
+}
 	}, false)
 
 	ctx=canv.getContext("2d");
@@ -70,11 +72,13 @@ function game() {
 	}
 	ctx.fillStyle="yellow";
 	ctx.fillRect(ax*gs,ay*gs,gs-2,gs-2);
+	moved = false;
 }
-/*
+
 gc.onclick = function pressed(event){
    var mx = event.clientX;
    var my = event.clientY;
+	 if(!moved){
   if(mx > 200 && xv ==0){
     yv=0;
     xv=1;
@@ -91,5 +95,6 @@ gc.onclick = function pressed(event){
     yv=-1;
     xv=0;
   }
+	moved = true;
 }
-*/
+}
