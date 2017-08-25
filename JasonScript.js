@@ -1,5 +1,4 @@
 var mobile =false;
-var moved = false;
 window.onload=function() {
 	canv=document.getElementById("gc");
 	canv.width=(gs*tc);
@@ -52,7 +51,6 @@ function game() {
 	ctx.fillStyle="yellow";
 	ctx.fillRect(ax*gs,ay*gs,gs-2,gs-2);
 	document.getElementById("score").innerHTML = "Score: " + tail;
-	moved = false;
 }
 
 canv.addEventListener('touchstart', function(e){
@@ -60,7 +58,7 @@ mobile = true;
 var touchobj = e.changedTouches[0];
 var mx = parseInt(touchobj.clientX);
 var my = parseInt(touchobj.clientY);
-if(mobile && !moved){
+if(mobile){
 if(mx > (gs*tc)/2.0 && xv ==0){
 	yv=0;
 	xv=1;
@@ -77,14 +75,13 @@ else if(my < (gs*tc)/2.0 && yv ==0){
 	yv=-1;
 	xv=0;
 }
-moved = true;
 }
 }, false)
 
 gc.onclick = function pressed(event){
    var mx = event.clientX;
    var my = event.clientY;
-	 if(!mobile && !moved){
+	 if(!mobile){
   if(mx > (gs*tc)/2.0 && xv ==0){
     yv=0;
     xv=1;
@@ -101,6 +98,5 @@ gc.onclick = function pressed(event){
     yv=-1;
     xv=0;
   }
-	moved = true;
 }
 }
