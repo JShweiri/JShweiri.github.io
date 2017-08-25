@@ -1,6 +1,7 @@
 
 window.onload=function(){
 var canv = document.getElementById("canvas");
+canv.addEventListener("onclick", pressed);
 var ctx = canv.getContext("2d");
 setInterval(game, 1000/15);
 }
@@ -52,7 +53,7 @@ if(ax==px && ay==py) {
     ctx.fillRect(ax*gs,ay*gs,gs-2,gs-2);
 }
 
-canv.onclick = function(){
+ function pressed(){
   if(event.clientX > 200 && xv ==0){
     yv=0;
     xv=1;
