@@ -10,7 +10,7 @@ ax=ay=15;
 xv=1;
 yv=0;
 trail=[];
-tail = 5;
+tail = 1;
 function game() {
 	px+=xv;
 	py+=yv;
@@ -50,7 +50,7 @@ function game() {
 	ctx.fillRect(ax*gs,ay*gs,gs-2,gs-2);
 }
 
- function pressed(){
+ function pressed(event){
   if(event.clientX > 200 && xv ==0){
     yv=0;
     xv=1;
