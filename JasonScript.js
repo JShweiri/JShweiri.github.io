@@ -36,7 +36,7 @@ gs=tc=25;
 ax=ay=15;
 xv=yv=0;
 trail=[];
-tail = 1;
+tail = 0;
 function game() {
 	px+=xv;
 	py+=yv;
@@ -60,7 +60,7 @@ function game() {
 	for(var i=0;i<trail.length;i++) {
 		ctx.fillRect(trail[i].x*gs,trail[i].y*gs,gs-2,gs-2);
 		if(trail[i].x==px && trail[i].y==py) {
-			tail = 1;
+			tail = 0;
 		}
 	}
 	trail.push({x:px,y:py});
@@ -75,7 +75,7 @@ function game() {
 	}
 	ctx.fillStyle="yellow";
 	ctx.fillRect(ax*gs,ay*gs,gs-2,gs-2);
-	document.getElementById("score").innerHTML = "Score: " + (tail-1);
+	document.getElementById("score").innerHTML = "Score: " + tail;
 }
 
 
