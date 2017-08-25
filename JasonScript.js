@@ -1,5 +1,29 @@
 window.onload=function() {
 	canv=document.getElementById("gc");
+	canv.addEventListener('touchstart', function(e){
+	var touchobj = e.changedTouches[0];
+	var mx = parseInt(touchobj.clientX);
+	var my = parseInt(touchobj.clientX);
+
+	if(mx > 200 && xv ==0){
+    yv=0;
+    xv=1;
+  }
+  else if(mx < 200 && xv ==0){
+    yv=0;
+    xv=-1;
+  }
+  else if(my > 200 && yv ==0){
+    yv=1;
+    xv=0;
+  }
+  else if(my < 200 && yv ==0){
+    yv=-1;
+    xv=0;
+  }
+
+	}, false)
+
 	ctx=canv.getContext("2d");
 	setInterval(game,1000/5);
 }
@@ -69,23 +93,3 @@ gc.onclick = function pressed(event){
   }
 }
 */
-gc.ontouchstart = function tooched(event){
-   var mx = event.touches[0].screenX;
-   var my = event.touches[0].screenY;
-  if(mx > 200 && xv ==0){
-    yv=0;
-    xv=1;
-  }
-  else if(mx < 200 && xv ==0){
-    yv=0;
-    xv=-1;
-  }
-  else if(my > 200 && yv ==0){
-    yv=1;
-    xv=0;
-  }
-  else if(my < 200 && yv ==0){
-    yv=-1;
-    xv=0;
-  }
-}
