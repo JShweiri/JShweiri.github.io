@@ -67,4 +67,3 @@ function game() {
     xv=0;
   }
 }
-}
