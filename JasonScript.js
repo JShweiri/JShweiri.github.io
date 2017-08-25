@@ -1,7 +1,7 @@
 window.onload=function() {
 	canv=document.getElementById("gc");
 	ctx=canv.getContext("2d");
-	setInterval(game,1000/15);
+	setInterval(game,1000/5);
 }
 px=py=10;
 gs=tc=20;
@@ -60,12 +60,12 @@ function pressed(event){
     yv=0;
     xv=-1;
   }
-  if(my > 200 && yv ==0){
+  /*if(my > 200 && yv ==0){
     yv=1;
     xv=0;
   }
   if(my < 200 && yv ==0){
     yv=-1;
     xv=0;
-  }
+  }*/
 }
