@@ -30,7 +30,7 @@ if(mobile){
 	setInterval(game,1000/5);
 }
 px=py=10;
-gs=tc=20;
+gs=tc=25;
 ax=ay=15;
 xv=yv=0;
 trail=[];
