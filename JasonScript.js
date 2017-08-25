@@ -1,7 +1,6 @@
 window.onload=function() {
 	canv=document.getElementById("gc");
 	ctx=canv.getContext("2d");
-	canv.addEventListener("onclick",pressed);
 	setInterval(game,1000/15);
 }
 px=py=10;
@@ -50,20 +49,22 @@ function game() {
 	ctx.fillRect(ax*gs,ay*gs,gs-2,gs-2);
 }
 
- function pressed(event){
-  if(event.clientX > 200 && xv ==0){
+ canvas.onclick = function pressed(event){
+   var mx = event.clientX;
+   var my = event.clientY;
+  if(mx > 200 && xv ==0){
     yv=0;
     xv=1;
   }
-  if(event.clientX < 200 && xv ==0){
+  if(mx < 200 && xv ==0){
     yv=0;
     xv=-1;
   }
-  if(event.clientY > 200 && yv ==0){
+  if(my > 200 && yv ==0){
     yv=1;
     xv=0;
   }
-  if(event.clientY < 200 && yv ==0){
+  if(my < 200 && yv ==0){
     yv=-1;
     xv=0;
   }
