@@ -29,7 +29,7 @@ function game(){
     py = tc-1;
   }
 ctx.fillStyle="black";
-ctx.fillRect(0,0,canvas.width,canvas.height);
+ctx.fillRect(0,0,canv.width,canv.height);
 
 ctx.fillStyle="Cyan";
 for (var i = 0; i<trail.length; i++){
