@@ -69,7 +69,7 @@ gc.onclick = function pressed(event){
   }
 }
 */
-gc.touchstart = function tooched(event){
+gc.ontouchstart = function tooched(event){
    var mx = event.touches[0].screenX;
    var my = event.touches[0].screenY;
   if(mx > 200 && xv ==0){
