@@ -3,7 +3,7 @@ window.onload=function() {
 	canv.addEventListener('touchstart', function(e){
 	var touchobj = e.changedTouches[0];
 	var mx = parseInt(touchobj.clientX);
-	var my = parseInt(touchobj.clientX);
+	var my = parseInt(touchobj.clientY);
 
 	if(mx > 200 && xv ==0){
     yv=0;
