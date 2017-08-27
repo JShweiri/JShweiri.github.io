@@ -1,10 +1,9 @@
-<!DOCTYPE html>
-<?php $jsString= 'testing'; ?>
+<?php $num = 3 + 4; ?>
 <html>
   <body>
     <script type="text/javascript">
-      var jsStringFromPhp=<?php echo json_encode($jsString); ?>;
-      alert(jsStringFromPhp);
+    var num = <?php echo $num ?>;
+      alert(num);
     </script>
   </body>
 </html>
