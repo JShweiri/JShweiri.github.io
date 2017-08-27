@@ -1,15 +1,10 @@
 <!DOCTYPE html>
-<?php $htmlInt= 6; ?>
+<?php $jsString= 'testing'; ?>
 <html>
-<head>
-<title>test Page</title>
-</head>
-
   <body>
     <script type="text/javascript">
-      // notice the quotes around the ?php tag
-      var htmlString= '<?php echo $htmlInt; >';
-      alert(htmlString);
+      var jsStringFromPhp=<?php echo json_encode($jsString); ?>;
+      alert(jsStringFromPhp);
     </script>
   </body>
 </html>
