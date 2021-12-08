@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<title> Karla <3 </title>
+</head>
+
+
+
+<body>
+
+<h1 id ="k">Hi!</h1>
+
+<script type="text/javascript">
+	var td = new Date();
+	var d = td.getHours();
+	if(d>3 && d<12){
+	  document.getElementById("k").innerHTML = "Good Morning!";
+	}
+	else if(d>=12 && d<16){
+	  document.getElementById("k").innerHTML = "Good Afternoon!";
+	}
+	else if(d>=16 && d<24){
+	  document.getElementById("k").innerHTML = "Good Night!";
+	}
+	else {
+	  document.getElementById("k").innerHTML = "Is this considered morning or night?";
+	}
+  
+	</script>
+
+</body>
+
+
+
+</html>
