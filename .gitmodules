@@ -1,0 +1,3 @@
+[submodule "C4Square"]
+	path = C4Square
+	url = https://github.com/JShweiri/C4Square.git
