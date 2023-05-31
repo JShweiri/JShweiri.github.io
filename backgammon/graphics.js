@@ -1,24 +1,50 @@
-// TODO: UI for moving checkers
+var backgammonBoard = document.getElementById("backgammonBoard");
+var ctx = backgammonBoard.getContext("2d");
 
-checkerDiameter = 30;
-gapBetweenCheckers = 5;
-barLength = 40;
-doublingCubeSize = 30;
-doublingCubeOffset = 5;
-dieSize = 30;
-dieDotRadius = 3;
-gapBetweenDice = 4;
+//make as large as posssible
+var w = window.innerWidth;
+var h = window.innerHeight;
+if(h/w < 0.6){
+    backgammonBoard.width = h/0.6;
+    backgammonBoard.height = h;
+} else {
+    backgammonBoard.width = w;
+    backgammonBoard.height = backgammonBoard.width*0.6;
+}
+
+//size of the spaces and radius of the pieces
+checkerDiameter = backgammonBoard.width/20;
+
+//spacing between checkers
+gapBetweenCheckers = backgammonBoard.width/120;
+
+//width of the middle bar
+barWidth = backgammonBoard.width/15;
+
+//size of the doubling cube
+doublingCubeSize = checkerDiameter;
+
+//spacing off the side of the board
+doublingCubeOffset = gapBetweenCheckers;
+
+//size of the rolling dice
+dieSize = checkerDiameter;
+dieDotRadius = dieSize/10;
+gapBetweenDice = backgammonBoard.width/150;
+
+//max checkers shown
 maxCheckersShown = 5;
 maxBarCheckersShown = 4;
 
-resignFlagPoleLength = 36;
-resignFlagSize = 20;
+//flag pole size
+resignFlagPoleHeight = backgammonBoard.height/10;
+resignFlagSize = backgammonBoard.height/18;
 
-verticalGap = 50;
+verticalGap = backgammonBoard.height/7;
 pointHeight = maxCheckersShown * checkerDiameter;
 
 barLeftBoundary = checkerDiameter * 6 + gapBetweenCheckers * 7;
-barRightBoundary = barLeftBoundary + barLength;
+barRightBoundary = barLeftBoundary + barWidth;
 barCenter = (barLeftBoundary + barRightBoundary) / 2;
 boardWidth = barRightBoundary + checkerDiameter * 6 + gapBetweenCheckers * 7;
 boardHeight = maxCheckersShown * checkerDiameter * 2 + verticalGap;
@@ -31,6 +57,9 @@ diceVerticalStartPoint = (boardHeight - dieSize) / 2;
 
 playerColor = "red";
 opponentColor = "blue";
+
+dice = [];
+gameStarted = false;
 
 function drawCheckers(ctx, numCheckers, pointStart, direction) {
     if (numCheckers == 0) {
@@ -115,8 +144,8 @@ function drawBoard(backgroundOnly,
 		   crawford,
                    resignationOffered,
 		   resignationValue) {
-    var backgammonBoard = document.getElementById("backgammonBoard");
-    var ctx = backgammonBoard.getContext("2d");
+    clickedPositions = [];
+    gameStarted = !backgroundOnly;
     ctx.strokeStyle = "black";
     ctx.fillStyle = "grey";
     ctx.clearRect(0,0,backgammonBoard.width,backgammonBoard.height);
@@ -157,7 +186,7 @@ function drawBoard(backgroundOnly,
     }
 
     // draw upper right points
-    pointStart += (barLength + gapBetweenCheckers);
+    pointStart += (barWidth + gapBetweenCheckers);
     for (var i=0; i<6; i++) {
         ctx.beginPath();
         ctx.moveTo(pointStart, 0);
@@ -195,7 +224,7 @@ function drawBoard(backgroundOnly,
     }
 
     // draw lower right points
-    pointStart += (barLength + gapBetweenCheckers);
+    pointStart += (barWidth + gapBetweenCheckers);
     for (var i=0; i<6; i++) {
         ctx.beginPath();
         ctx.moveTo(pointStart, boardHeight);
@@ -226,6 +255,9 @@ function drawBoard(backgroundOnly,
     // draw dice
     if (dice1 > 0) {
 	drawDice(ctx, dice1, dice2, turn);
+    dice = [dice1, dice2];
+    } else {
+    dice = [];
     }
 
     if (!crawford) {
@@ -292,55 +324,55 @@ function drawBoard(backgroundOnly,
 
 	ctx.beginPath();
 	ctx.strokeStyle = "black";
-	ctx.moveTo(resignationFlagHorizontal, (boardHeight - resignFlagPoleLength)/2);
-	ctx.lineTo(resignationFlagHorizontal, (boardHeight + resignFlagPoleLength)/2);
+	ctx.moveTo(resignationFlagHorizontal, (boardHeight - resignFlagPoleHeight)/2);
+	ctx.lineTo(resignationFlagHorizontal, (boardHeight + resignFlagPoleHeight)/2);
 	ctx.stroke();
-	ctx.strokeRect(resignationFlagHorizontal, (boardHeight - resignFlagPoleLength)/2, resignFlagSize, resignFlagSize);
+	ctx.strokeRect(resignationFlagHorizontal, (boardHeight - resignFlagPoleHeight)/2, resignFlagSize, resignFlagSize);
 	ctx.fillStyle = "black";
 	ctx.font = "14px sans-serif";
-	ctx.fillText(resignationValue, resignationFlagHorizontal + resignFlagSize / 2 - ctx.measureText(resignationValue).width / 2,  (boardHeight - resignFlagPoleLength + resignFlagSize)/2 + 4);
+	ctx.fillText(resignationValue, resignationFlagHorizontal + resignFlagSize / 2 - ctx.measureText(resignationValue).width / 2,  (boardHeight - resignFlagPoleHeight + resignFlagSize)/2 + 4);
     }
 
-    var info = document.getElementById("info");
-    info.innerHTML = "Score: " + myScore + "-" + opponentScore + (matchLength > 0 ? " Match to: " + matchLength : "") + (crawford ? " Crawford" : "");
-    var instructions = document.getElementById("instructions");
-    if (turn == 0) {
-	instructions.innerHTML = "";
-    } else {
-	if (dice1 > 0) {
-	    instructions.innerHTML = "Enter your move below";
-	    document.getElementById("roll").disabled = true;
-	    document.getElementById("double").disabled = true;
-	    document.getElementById("accept").disabled = true;
-	    document.getElementById("reject").disabled = true;
-	    document.getElementById("beaver").disabled = true;
-	    document.getElementById("resign").disabled = false;
-	} else if (wasDoubled) {
-	    instructions.innerHTML = "Accept or reject the double";
-	    document.getElementById("roll").disabled = true;
-	    document.getElementById("double").disabled = true;
-	    document.getElementById("accept").disabled = false;
-	    document.getElementById("reject").disabled = false;
-	    document.getElementById("beaver").disabled = (matchLength > 0);
-	    document.getElementById("resign").disabled = true;
-        } else if (resignationOffered) {
-	    instructions.innerHTML = "Accept or reject the resignation";
-	    document.getElementById("roll").disabled = true;
-	    document.getElementById("double").disabled = true;
-	    document.getElementById("accept").disabled = false;
-	    document.getElementById("reject").disabled = false;
-	    document.getElementById("beaver").disabled = true;
-	    document.getElementById("resign").disabled = true;
-	} else {
-	    instructions.innerHTML = "Roll or double";
-	    document.getElementById("roll").disabled = false;
-	    document.getElementById("double").disabled = false;
-	    document.getElementById("accept").disabled = true;
-	    document.getElementById("reject").disabled = true;
-	    document.getElementById("beaver").disabled = true;
-	    document.getElementById("resign").disabled = false;
-	}
-    }
+    // var info = document.getElementById("info");
+    // info.innerHTML = "Score: " + myScore + "-" + opponentScore + (matchLength > 0 ? " Match to: " + matchLength : "") + (crawford ? " Crawford" : "");
+    // var instructions = document.getElementById("instructions");
+    // if (turn == 0) {
+	// instructions.innerHTML = "";
+    // } else {
+	// if (dice1 > 0) {
+	//     instructions.innerHTML = "Enter your move below";
+	//     document.getElementById("roll").disabled = true;
+	//     document.getElementById("double").disabled = true;
+	//     document.getElementById("accept").disabled = true;
+	//     document.getElementById("reject").disabled = true;
+	//     document.getElementById("beaver").disabled = true;
+	//     document.getElementById("resign").disabled = false;
+	// } else if (wasDoubled) {
+	//     instructions.innerHTML = "Accept or reject the double";
+	//     document.getElementById("roll").disabled = true;
+	//     document.getElementById("double").disabled = true;
+	//     document.getElementById("accept").disabled = false;
+	//     document.getElementById("reject").disabled = false;
+	//     document.getElementById("beaver").disabled = (matchLength > 0);
+	//     document.getElementById("resign").disabled = true;
+    //     } else if (resignationOffered) {
+	//     instructions.innerHTML = "Accept or reject the resignation";
+	//     document.getElementById("roll").disabled = true;
+	//     document.getElementById("double").disabled = true;
+	//     document.getElementById("accept").disabled = false;
+	//     document.getElementById("reject").disabled = false;
+	//     document.getElementById("beaver").disabled = true;
+	//     document.getElementById("resign").disabled = true;
+	// } else {
+	//     instructions.innerHTML = "Roll or double";
+	//     document.getElementById("roll").disabled = false;
+	//     document.getElementById("double").disabled = false;
+	//     document.getElementById("accept").disabled = true;
+	//     document.getElementById("reject").disabled = true;
+	//     document.getElementById("beaver").disabled = true;
+	//     document.getElementById("resign").disabled = false;
+	// }
+    // }
 }
 
 function intermediatePoint(a, b, t) {
