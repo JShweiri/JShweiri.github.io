@@ -1,15 +1,19 @@
 <html>
+<head>
+   <title>gnubg online</title>
+   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+</head>
 <meta charset="UTF-8">
 <canvas id="backgammonBoard" width="600" height="360"></canvas>
 <div>
-<form id="command_form">
+<form hidden id="command_form">
    <label for="command_text">Move or gnubg command:</label>
    <input id="command_text" type="text"></input>
    <input type="submit" value="Submit"></input>
 </form>
 </div>
 
-<textarea id="gnubg_log" cols="120" rows="20" readonly="true">
+<textarea hidden id="gnubg_log" cols="120" rows="20" readonly="true">
 Loading, please wait...
 </textarea> 
 
