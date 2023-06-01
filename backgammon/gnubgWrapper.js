@@ -39,8 +39,10 @@ function gnubgCommand(command) {
     fillCommandBuffer(commandBuffer, command);
     writeLog("=> " + command);
     Module._run_command(commandBuffer);
-    window.setTimeout(doNextTurn, 0);
+    window.setTimeout(doNextTurn, 0); // modify opponents delay? maybe should do this in gnubg settings..
 }
+
+eventEmitter = new EventTarget();
 
 lastLogLine = "";  // needed for stdin prompts from gnubg's GetInput function in gnubg.c
 function writeLog(str) {
@@ -49,8 +51,10 @@ function writeLog(str) {
         console.log(str);
     } else {
         if (str.startsWith("board:") || str.includes("offers to resign")) {
-            updateBoard(str);
-            window.setTimeout(doNextTurn, 1000);
+            const boardEvent = new CustomEvent('boardUpdate', { 
+                detail: str,
+            });
+            eventEmitter.dispatchEvent(boardEvent);
         }
 
         if (!str.startsWith("board:")) {
@@ -65,79 +69,6 @@ function writeLog(str) {
 
 function doNextTurn() {
     Module._doNextTurn();
-}
-
-function updateBoard(rawBoard) {
-lastTurn = 0;
-lastBoard = "";
-resignationOfferPending = false;
-resignationValue = 0;
-    
-    if (resignationOfferPending) {  // Ignore board update immediately after resignation offer, since nothing has changed and we don't want to remove the "Accept or reject the resignation" message
-        resignationOfferPending = false;
-        resignationValue = 0;
-        return;
-    }
-    var resignationOffered = false;
-    if (rawBoard.includes("offers to resign")) {
-        resignationOffered = true;
-        resignationOfferPending = true;
-        if (rawBoard.endsWith("a single game.")) {
-            resignationValue = 1;
-        } else if (rawBoard.endsWith("a gammon.")) {
-            resignationValue = 2;
-        } else if (rawBoard.endsWith("a backgammon.")) {
-            resignationValue = 3;
-        } else {
-            console.error("Unknown resignation value " + resignationValue);
-        }
-        rawBoard = lastBoard;
-    }
-
-    var rawBoardSplit = rawBoard.split(":");
-    var myName = rawBoardSplit[1];
-    var opponentName = rawBoardSplit[2];
-    var boardString = rawBoardSplit.slice(6, 6 + 26);
-    var board = boardString.map(function (x) { return parseInt(x); });
-    var matchLength = parseInt(rawBoardSplit[3]);
-    var myScore = parseInt(rawBoardSplit[4]);
-    var opponentScore = parseInt(rawBoardSplit[5]);
-    var turn = parseInt(rawBoardSplit[32]);
-    var dice1 = parseInt(rawBoardSplit[33]);
-    var dice2 = parseInt(rawBoardSplit[34]);
-    var cubeValue = parseInt(rawBoardSplit[37]);
-    var iMayDouble = parseInt(rawBoardSplit[38]);
-    var opponentMayDouble = parseInt(rawBoardSplit[39]);
-    var wasDoubled = parseInt(rawBoardSplit[40]);
-    var myPiecesOff = parseInt(rawBoardSplit[45]);
-    var opponentPiecesOff = parseInt(rawBoardSplit[46]);
-    var crawford = parseInt(rawBoardSplit[51]);
-
-    if (dice1 > 0 && turn != lastTurn) {
-        var name = (turn == 1) ? myName : opponentName;
-        writeLog(name + " rolls " + dice1 + " " + dice2);
-        lastTurn = turn;
-    }
-
-    drawBoard(false,
-        board,
-        matchLength,
-        myScore,
-        opponentScore,
-        turn,
-        dice1,
-        dice2,
-        cubeValue,
-        iMayDouble,
-        opponentMayDouble,
-        wasDoubled,
-        myPiecesOff,
-        opponentPiecesOff,
-        crawford,
-        resignationOffered,
-        resignationValue);
-
-    lastBoard = rawBoard;
 }
 
 function newSession() {
@@ -225,11 +156,9 @@ fakeUpload.addEventListener("change", function () {
     fakeUpload.click();
 }
 
-includeJs('./gnubg.js')
-
+ inputBuffer = "";
+ inputBufferPointer = 0;
 var Module = {
-    inputBuffer: "",
-    inputBufferPointer: 0,
     preRun: [
         function () {
             FS.init(
@@ -257,3 +186,4 @@ var Module = {
         Module._start();
     }
 }
+ includeJs('./gnubg.js')
