@@ -39,7 +39,7 @@ function gnubgCommand(command) {
   fillCommandBuffer(commandBuffer, command);
   writeLog('=> ' + command);
   Module._run_command(commandBuffer);
-  window.setTimeout(doNextTurn, 0); // modify opponents delay? maybe should do this in gnubg settings..
+  window.setTimeout(doNextTurn, 0);
 }
 
 eventEmitter = new EventTarget();
