@@ -287,22 +287,50 @@ function drawBoard(boardState) {
   if (!boardState) {
     ctx.fillStyle = 'black';
     ctx.font = '16px sans-serif';
-    const text = 'Click anywhere to begin. Click anywhere to roll. Click on the checkers to move them. Moves will be made in the order the dice are shown.\nInvert the dice by clicking on them. After making a move submit it, or if you don\'t like it you can clear it';
+    const text = 'Click anywhere to begin. Click anywhere to roll. Click on the checkers to move them. Moves will be made in the order the dice are shown. Invert the dice by clicking on them. After making a move submit it, or if you don\'t like it you can clear it';
 
-    // Define line height for spacing between lines
-    const lineHeight = 20;
+var x = boardWidth/2;
+var y = boardHeight / 2 + 4;
+var maxWidth = backgammonBoard.width; // The maximum width of a line, leaving some margin
+var lineHeight = 20;
 
-    // Split text by newline character to get each line
-    const lines = text.split('\n');
+function getLines(context, text, maxWidth) {
+    var words = text.split(' ');
+    var lines = [];
+    var currentLine = words[0];
 
-    let y = boardHeight / 2 + 4;
-
-    // Loop through each line and draw it
-    for (var i = 0; i < lines.length; i++) {
-      const x = boardWidth/2 - ctx.measureText(lines[i]).width / 2;
-      ctx.fillText(lines[i], x, y);
-      y += lineHeight;
+    for (var i = 1; i < words.length; i++) {
+        var word = words[i];
+        var width = context.measureText(currentLine + " " + word).width;
+        if (width < maxWidth) {
+            currentLine += " " + word;
+        } else {
+            lines.push(currentLine);
+            currentLine = word;
+        }
     }
+    lines.push(currentLine);
+    return lines;
+}
+
+var lines = getLines(ctx, text, maxWidth);
+y = y - (lines.length-1)*lineHeight/2;
+for (var i = 0; i < lines.length; i++) {
+    const x = boardWidth/2 - ctx.measureText(lines[i]).width / 2;
+    ctx.fillText(lines[i], x, y + i*lineHeight);
+}
+
+
+
+
+
+
+
+
+
+
+
+
     return;
   }
 
