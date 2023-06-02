@@ -27,9 +27,12 @@ let lastState = {};
 const CPU_DELAY_MS = 300;
 
 // make as large as posssible
-var w = window.innerWidth;
-var h = window.innerHeight;
-let ar = 0.67; //found this number through trial and error
+var w = window.innerWidth*0.97;
+var h = window.innerHeight*0.97;
+
+//board is about 15 checker diameters wide
+//height is about 12.5 checker diameters high
+let ar = 12.5/15;
 if (h / w < ar) {
   backgammonBoard.width = h / ar;
   backgammonBoard.height = h;
@@ -39,13 +42,13 @@ if (h / w < ar) {
 }
 
 // size of the spaces and radius of the pieces
-const checkerDiameter = backgammonBoard.width / 20;
+const checkerDiameter = backgammonBoard.width / 15;
 
 // spacing between checkers
-const gapBetweenCheckers = backgammonBoard.width / 120;
+const gapBetweenCheckers = checkerDiameter / 7;
 
 // width of the middle bar
-const barWidth = backgammonBoard.width / 15;
+const barWidth = checkerDiameter;
 
 // size of the doubling cube
 const doublingCubeSize = checkerDiameter;
@@ -56,17 +59,18 @@ const doublingCubeOffset = gapBetweenCheckers;
 // size of the rolling dice
 const dieSize = checkerDiameter;
 const dieDotRadius = dieSize / 10;
-const gapBetweenDice = backgammonBoard.width / 150;
+const gapBetweenDice = checkerDiameter / 10;
 
 // max checkers shown
 const maxCheckersShown = 5;
 const maxBarCheckersShown = 3;
 
 // flag pole size
-const resignFlagPoleHeight = backgammonBoard.height / 10;
-const resignFlagSize = backgammonBoard.height / 20;
+const resignFlagPoleHeight = backgammonBoard.width*ar / 10;
+const resignFlagSize = backgammonBoard.width*ar / 20;
 
-const verticalGap = backgammonBoard.height / 7;
+// const verticalGap = backgammonBoard.height / 7;
+const verticalGap = checkerDiameter*1.5;
 const pointHeight = maxCheckersShown * checkerDiameter;
 
 const barLeftBoundary = checkerDiameter * 6 + gapBetweenCheckers * 7;
@@ -107,12 +111,7 @@ const opponentColor = 'orange';
 
 const autoSubmit = false;
 
-// Get the desired board width based on current calculations
-var desiredCanvasWidth = barRightBoundary + checkerDiameter * 6 + gapBetweenCheckers * 7 + 2;
-var desiredCanvasHeight = boardHeight + checkerDiameter + gapBetweenCheckers ; // for eating at end
-
-backgammonBoard.width = desiredCanvasWidth;
-backgammonBoard.height = desiredCanvasHeight;
+backgammonBoard.width+=2;
 
 function drawCheckers(ctx, numCheckers, pointStart, direction) {
   if (numCheckers == 0) {
