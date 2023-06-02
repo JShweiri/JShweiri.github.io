@@ -3,14 +3,18 @@ var ctx = backgammonBoard.getContext('2d');
 
 // TODO:
 
-//separate into files
-//3 files? playLocal, training, online... move shared stuff to separate file (common)
+// separate into files
+// 3 files? playLocal, training, online... move shared stuff to separate file (common)
 
-//give each button/object a position struct.
+//add prev and next buttons next to resign
+
+// make single move, switch dice, make other move.. glitch
+
+// give each button/object a position struct.
 
 // give locations on board constants as positions
 
-//move eaten checkers to above/below?
+// move eaten checkers to above/below?
 
 // use typescript
 
@@ -24,15 +28,15 @@ var ctx = backgammonBoard.getContext('2d');
 let currentState = {};
 let lastState = {};
 
-const CPU_DELAY_MS = 300;
+const CPU_DELAY_MS = 1000;
 
 // make as large as posssible
 var w = window.innerWidth*0.97;
 var h = window.innerHeight*0.97;
 
-//board is about 15 checker diameters wide
-//height is about 12.5 checker diameters high
-let ar = 12.5/15;
+// board is about 15 checker diameters wide
+// height is about 12.5 checker diameters high
+const ar = 12.5/15;
 if (h / w < ar) {
   backgammonBoard.width = h / ar;
   backgammonBoard.height = h;
@@ -51,7 +55,7 @@ const gapBetweenCheckers = checkerDiameter / 7;
 const barWidth = checkerDiameter;
 
 // size of the doubling cube
-const doublingCubeSize = checkerDiameter;
+const doublingCubeSize = checkerDiameter*0.85;
 
 // spacing off the side of the board
 const doublingCubeOffset = gapBetweenCheckers;
@@ -93,13 +97,13 @@ const clearLeft = (barLeftBoundary + gapBetweenDice) / 2;
 const clearSubmitBottom = (boardHeight - buttonHeight) / 2;
 
 // Calculate the center of the cube
-const cubeHorizontal = (boardWidth - doublingCubeSize)/2 ;
+const cubeHorizontal = (boardWidth - doublingCubeSize)/2;
 const cubeCenter = (barRightBoundary + boardWidth) / 2;
 
 const acceptHorizontal = cubeCenter + doublingCubeSize/2 + doublingCubeOffset;
 const rejectHorizontal = cubeCenter - doublingCubeSize/2 - doublingCubeOffset - buttonWidth;
 
-//under my rightmost checker
+// under my rightmost checker
 const resignWidth = checkerDiameter;
 const resignHeight = checkerDiameter;
 const resignLeft = barRightBoundary + 5*(checkerDiameter + gapBetweenCheckers) + resignWidth/2;
@@ -179,7 +183,10 @@ function drawBarCheckers(ctx, numCheckers, direction) {
   ctx.fillStyle = 'grey';
 }
 
+dontDraw = false;
+
 function drawBoard(boardState) {
+    if(dontDraw) return;
   console.log(boardState);
   ctx.strokeStyle = 'black';
   ctx.fillStyle = 'grey';
@@ -278,6 +285,24 @@ function drawBoard(boardState) {
   }
 
   if (!boardState) {
+    ctx.fillStyle = 'black';
+    ctx.font = '16px sans-serif';
+    const text = 'Click anywhere to begin. Click anywhere to roll. Click on the checkers to move them. Moves will be made in the order the dice are shown.\nInvert the dice by clicking on them. After making a move submit it, or if you don\'t like it you can clear it';
+
+    // Define line height for spacing between lines
+    const lineHeight = 20;
+
+    // Split text by newline character to get each line
+    const lines = text.split('\n');
+
+    let y = boardHeight / 2 + 4;
+
+    // Loop through each line and draw it
+    for (var i = 0; i < lines.length; i++) {
+      const x = boardWidth/2 - ctx.measureText(lines[i]).width / 2;
+      ctx.fillText(lines[i], x, y);
+      y += lineHeight;
+    }
     return;
   }
 
@@ -311,7 +336,6 @@ function drawBoard(boardState) {
       cubeVertical = (boardHeight - doublingCubeSize) / 2;
       if (boardState.wasDoubled > 0) { // opponent doubled player
       } else { // player doubled opponent
-
         ctx.fillStyle = 'green';
         ctx.fillRect(acceptHorizontal, cubeVertical, buttonWidth, buttonHeight);
         ctx.font = '14px sans-serif';
@@ -337,9 +361,9 @@ function drawBoard(boardState) {
       if (boardState.iMayDouble && boardState.opponentMayDouble) { // centered cube
         cubeVertical = (boardHeight - doublingCubeSize) / 2;
       } else if (boardState.iMayDouble) {
-        cubeVertical = boardHeight - doublingCubeSize;
+        cubeVertical = boardHeight - doublingCubeSize - doublingCubeOffset;
       } else if (boardState.opponentMayDouble) {
-        cubeVertical = 2;
+        cubeVertical = doublingCubeOffset;
       }
     }
     ctx.strokeRect(cubeHorizontal, cubeVertical, doublingCubeSize, doublingCubeSize);
@@ -348,31 +372,31 @@ function drawBoard(boardState) {
     ctx.fillText(cubeValueToShow, cubeHorizontal + (doublingCubeSize - ctx.measureText(cubeValueToShow).width) / 2, cubeVertical + doublingCubeSize / 2 + 4);
   }
 
-//dont draw pieces off for now
+  // dont draw pieces off for now
 
-//   if (boardState.myPiecesOff > 0) {
-//     ctx.fillStyle = playerColor;
-//     var checkerOffHorizontal = boardWidth + doublingCubeOffset + doublingCubeSize / 2;
-//     var checkerOffVertical = boardHeight - doublingCubeSize - gapBetweenCheckers - checkerDiameter / 2;
-//     ctx.beginPath();
-//     ctx.arc(checkerOffHorizontal, checkerOffVertical, checkerDiameter / 2, 0, 2 * Math.PI);
-//     ctx.fill();
-//     ctx.fillStyle = 'white';
-//     ctx.font = '14px sans-serif';
-//     ctx.fillText(boardState.myPiecesOff, checkerOffHorizontal - ctx.measureText(boardState.myPiecesOff).width / 2, checkerOffVertical + 4);
-//   }
+  //   if (boardState.myPiecesOff > 0) {
+  //     ctx.fillStyle = playerColor;
+  //     var checkerOffHorizontal = boardWidth + doublingCubeOffset + doublingCubeSize / 2;
+  //     var checkerOffVertical = boardHeight - doublingCubeSize - gapBetweenCheckers - checkerDiameter / 2;
+  //     ctx.beginPath();
+  //     ctx.arc(checkerOffHorizontal, checkerOffVertical, checkerDiameter / 2, 0, 2 * Math.PI);
+  //     ctx.fill();
+  //     ctx.fillStyle = 'white';
+  //     ctx.font = '14px sans-serif';
+  //     ctx.fillText(boardState.myPiecesOff, checkerOffHorizontal - ctx.measureText(boardState.myPiecesOff).width / 2, checkerOffVertical + 4);
+  //   }
 
-//   if (boardState.opponentPiecesOff > 0) {
-//     ctx.fillStyle = opponentColor;
-//     var checkerOffHorizontal = boardWidth + doublingCubeOffset + doublingCubeSize / 2;
-//     var checkerOffVertical = 2 + doublingCubeSize + gapBetweenCheckers + checkerDiameter / 2;
-//     ctx.beginPath();
-//     ctx.arc(checkerOffHorizontal, checkerOffVertical, checkerDiameter / 2, 0, 2 * Math.PI);
-//     ctx.fill();
-//     ctx.fillStyle = 'white';
-//     ctx.font = '14px sans-serif';
-//     ctx.fillText(boardState.opponentPiecesOff, checkerOffHorizontal - ctx.measureText(boardState.opponentPiecesOff).width / 2, checkerOffVertical + 4);
-//   }
+  //   if (boardState.opponentPiecesOff > 0) {
+  //     ctx.fillStyle = opponentColor;
+  //     var checkerOffHorizontal = boardWidth + doublingCubeOffset + doublingCubeSize / 2;
+  //     var checkerOffVertical = 2 + doublingCubeSize + gapBetweenCheckers + checkerDiameter / 2;
+  //     ctx.beginPath();
+  //     ctx.arc(checkerOffHorizontal, checkerOffVertical, checkerDiameter / 2, 0, 2 * Math.PI);
+  //     ctx.fill();
+  //     ctx.fillStyle = 'white';
+  //     ctx.font = '14px sans-serif';
+  //     ctx.fillText(boardState.opponentPiecesOff, checkerOffHorizontal - ctx.measureText(boardState.opponentPiecesOff).width / 2, checkerOffVertical + 4);
+  //   }
 
   ctx.beginPath();
   ctx.strokeStyle = 'black';
@@ -383,7 +407,7 @@ function drawBoard(boardState) {
   ctx.fillStyle = 'black';
   ctx.font = '14px sans-serif';
   ctx.fillText('resign', resignLeft + resignFlagSize / 2 - ctx.measureText('resign').width / 2, resignBottom - resignHeight + resignFlagSize / 2 + 4); // place the text at the center of the flag
-  
+
   if (boardState.resignationOffered) {
     let resignationFlagHorizontal;
     if (boardState.turn == 1) { // player offered resignation to opponent
@@ -410,7 +434,6 @@ function drawBoard(boardState) {
       const textX2 = rejectHorizontal + (buttonWidth - textSize2.width) / 2;
       const textY2 = (boardHeight - buttonHeight)/2 + (buttonHeight + 14) / 2; // 14 is the font size
       ctx.fillText(text2, textX2, textY2 - 2);
-
     }
 
     ctx.beginPath();
@@ -577,6 +600,8 @@ window.addEventListener('load', function() {
 let moves = [];
 
 backgammonBoard.onclick = function(ev) {
+    if(dontDraw) return;
+
   const {
     offsetX: x,
     offsetY: y,
@@ -640,25 +665,24 @@ backgammonBoard.onclick = function(ev) {
   }
 
   // Perform logic based on the click coordinates
-  if(currentState.turn == 1){
-
-// Submit
-if (isInResignButtonArea(x, y)) {
-    let resignAmount = 'a';
-    while(isNaN(resignAmount) || (resignAmount > 3)){
+  if (currentState.turn == 1) {
+    // Submit
+    if (isInResignButtonArea(x, y)) {
+      let resignAmount = 'a';
+      while (isNaN(resignAmount) || (resignAmount > 3)) {
         resignAmount = parseInt(window.prompt('How many points would you like to resign (1, 2, 3)?'));
+      }
+      console.log('resign ' + resignAmount);
+      gnubgCommand('resign ' + resignAmount);
+      return;
     }
-    console.log('resign ' + resignAmount)
-    gnubgCommand('resign ' + resignAmount);
-    return;
-}
 
-  if (isInBarArea(x)) {
-    handleBarAreaClick();
-  } else {
-    handleBoardAreaClick(x, y);
+    if (isInBarArea(x)) {
+      handleBarAreaClick();
+    } else {
+      handleBoardAreaClick(x, y);
+    }
   }
-}
 
   if (isMovesFinished() && autoSubmit) {
     processMoves();
@@ -691,7 +715,7 @@ function isInSubmitButtonArea(x, y) {
 }
 
 function isInResignButtonArea(x, y) {
-    return x >= resignLeft && x <= resignLeft + resignWidth && y >= resignBottom - resignHeight && y < resignBottom;
+  return x >= resignLeft && x <= resignLeft + resignWidth && y >= resignBottom - resignHeight && y < resignBottom;
 }
 
 function handleSubmitButtonPress() {
@@ -755,8 +779,8 @@ function handleExistingChecker(point) {
   const lastChecker = getLastChecker();
   const targetIndex = point - currentState.dice[moves.length];
 
-//if taking a piece off the board and able to
-if(targetIndex<=0 && lastChecker <= 6){
+  // if taking a piece off the board and able to
+  if (targetIndex<=0 && lastChecker <= 6) {
     handleBearingOff(point, lastChecker, targetIndex);
   } else if (point - currentState.dice[moves.length] > 0 && currentState.board[point - currentState.dice[moves.length]] >= -1) { // You can land at the spot safely
     handleSafeLanding(point);
@@ -772,13 +796,13 @@ function getLastChecker() {
 }
 
 function handleBearingOff(point, lastChecker, targetIndex) {
-        //and the move makes sense
-        if(point == lastChecker || targetIndex == 0){
-            //make the move
-            currentState.myPiecesOff += 1;
-            currentState.board[point] -= 1;
-            moves.push(`${point}/0`);
-        }
+  // and the move makes sense
+  if (point == lastChecker || targetIndex == 0) {
+    // make the move
+    currentState.myPiecesOff += 1;
+    currentState.board[point] -= 1;
+    moves.push(`${point}/0`);
+  }
 }
 
 function handleSafeLanding(point) {
@@ -864,31 +888,35 @@ function parseState(rawBoard) {
 resignationOfferPending = false;
 resignationValue = 0;
 function updateBoard(rawBoard) {
-  if (resignationOfferPending) {  // Ignore board update immediately after resignation offer, since nothing has changed and we don't want to remove the "Accept or reject the resignation" message
-   resignationOfferPending = false;
-   resignationValue = 0;
-   return;
-      }
-      var resignationOffered = false;
-      if (rawBoard.includes("offers to resign")) {
-      resignationOffered = true;
-      resignationOfferPending = true;	
-      if (rawBoard.endsWith("a single game.")) {
-          resignationValue = 1;
-          } else if (rawBoard.endsWith("a gammon.")) {
-              resignationValue = 2;
-          } else if (rawBoard.endsWith("a backgammon.")) {
-              resignationValue = 3;
-          } else {
-              console.error("Unknown resignation value " + resignationValue);
-          }
-      }
+  if (resignationOfferPending) { // Ignore board update immediately after resignation offer, since nothing has changed and we don't want to remove the "Accept or reject the resignation" message
+    resignationOfferPending = false;
+    resignationValue = 0;
+    return;
+  }
+  let resignationOffered = false;
+  if (rawBoard.includes('offers to resign')) {
+    resignationOffered = true;
+    resignationOfferPending = true;
+    if (rawBoard.endsWith('a single game.')) {
+      resignationValue = 1;
+    } else if (rawBoard.endsWith('a gammon.')) {
+      resignationValue = 2;
+    } else if (rawBoard.endsWith('a backgammon.')) {
+      resignationValue = 3;
+    } else {
+      console.error('Unknown resignation value ' + resignationValue);
+    }
+  }
   lastState = currentState;
   currentState = parseState(rawBoard);
-  console.log(lastState.turn == -1 && currentState.turn == 1)
-  if(lastState.turn == -1 && currentState.turn == 1){
-    window.setTimeout(drawBoard, CPU_DELAY_MS, currentState);
-  }else {
+  console.log(lastState.turn == -1 && currentState.turn == 1);
+  if (lastState.turn == -1 && currentState.turn == 1) {
+    dontDraw = true;
+    window.setTimeout(()=>{
+        dontDraw = false;
+        drawBoard(currentState);
+    }, CPU_DELAY_MS,);
+  } else {
     drawBoard(currentState);
   }
 }

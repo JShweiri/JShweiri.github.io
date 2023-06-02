@@ -44,6 +44,8 @@ function gnubgCommand(command) {
 
 eventEmitter = new EventTarget();
 
+totalAnal = '';
+analFlag = 0;
 lastLogLine = ''; // needed for stdin prompts from gnubg's GetInput function in gnubg.c
 function writeLog(str) {
   // console.log(str); // FOR DEBUGGING
@@ -56,6 +58,23 @@ function writeLog(str) {
       });
       eventEmitter.dispatchEvent(boardEvent);
     }
+    const pattern = /^    \d+./;
+    if (pattern.test(str) || analFlag) {
+      totalAnal += str +'\n';
+      analFlag++;
+      if (analFlag >= 3) {
+        analFlag=0;
+      }
+    }
+    // anal terminated by a help command
+    if (str.startsWith('Available commands:') && totalAnal != '') {
+      const analEvent = new CustomEvent('analResults', {
+        detail: totalAnal,
+      });
+      eventEmitter.dispatchEvent(analEvent);
+      totalAnal = '';
+    }
+
 
     if (!str.startsWith('board:')) {
       lastLogLine = str;
