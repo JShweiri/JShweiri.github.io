@@ -28,7 +28,7 @@ var ctx = backgammonBoard.getContext('2d');
 let currentState = {};
 let lastState = {};
 
-const CPU_DELAY_MS = 1000;
+const CPU_DELAY_MS = 0;
 
 // make as large as posssible
 var w = window.innerWidth*0.97;
@@ -545,6 +545,9 @@ backgammonBoard.onclick = function(ev) {
   } = ev;
 
   if (!currentState.board) {
+    gnubgCommand('set player 0 chequerplay type evaluation');
+    gnubgCommand('set player 0 chequerplay evaluation plies 3');
+    gnubgCommand('set player 0 chequerplay evaluation prune on');
     newGame();
     return;
   } else if (currentState.dice.length === 0 || currentState.resignationOffered) {
