@@ -1,5 +1,5 @@
-var backgammonBoard = document.getElementById('backgammonBoard');
-var ctx = backgammonBoard.getContext('2d');
+const backgammonBoard = document.getElementById('backgammonBoard');
+const ctx = backgammonBoard.getContext('2d');
 
 // TODO:
 
@@ -28,11 +28,11 @@ var ctx = backgammonBoard.getContext('2d');
 let currentState = {};
 let lastState = {};
 
-const CPU_DELAY_MS = 0;
+const CPU_DELAY_MS = 1000;
 
 // make as large as posssible
-var w = window.innerWidth*0.97;
-var h = window.innerHeight*0.97;
+const w = window.innerWidth*0.97;
+const h = window.innerHeight*0.97;
 
 // board is about 15 checker diameters wide
 // height is about 12.5 checker diameters high
@@ -46,68 +46,75 @@ if (h / w < ar) {
 }
 
 // size of the spaces and radius of the pieces
-const checkerDiameter = backgammonBoard.width / 15;
+const CHECKER_DIAMETER = backgammonBoard.width / 15;
 
 // spacing between checkers
-const gapBetweenCheckers = checkerDiameter / 7;
+const GAP_BETWEEN_CHKRS = CHECKER_DIAMETER / 7;
 
 // width of the middle bar
-const barWidth = checkerDiameter;
+const BAR_WIDTH = CHECKER_DIAMETER;
 
 // size of the doubling cube
-const doublingCubeSize = checkerDiameter*0.85;
+const DBL_CUBE_SIZE = CHECKER_DIAMETER*0.85;
 
 // spacing off the side of the board
-const doublingCubeOffset = gapBetweenCheckers;
+const DBL_CUBE_OFFSET = GAP_BETWEEN_CHKRS;
 
 // size of the rolling dice
-const dieSize = checkerDiameter;
-const dieDotRadius = dieSize / 10;
-const gapBetweenDice = checkerDiameter / 10;
+const DIE_SIZE = CHECKER_DIAMETER*0.75;
+const DIE_DOT_RADIUS = DIE_SIZE / 10;
+const GAP_BETWEEN_DICE = CHECKER_DIAMETER / 10;
 
 // max checkers shown
-const maxCheckersShown = 5;
-const maxBarCheckersShown = 3;
+const MAX_CHKRS_SHOWN = 5;
+const MAX_BAR_CHKRS_SHOWN = 3;
 
 // flag pole size
-const resignFlagPoleHeight = backgammonBoard.width*ar / 10;
-const resignFlagSize = backgammonBoard.width*ar / 20;
+const FLAG_POLE_HEIGHT = backgammonBoard.width*ar / 10;
+const FLAG_SIZE = backgammonBoard.width*ar / 20;
 
-// const verticalGap = backgammonBoard.height / 7;
-const verticalGap = checkerDiameter*1.5;
-const pointHeight = maxCheckersShown * checkerDiameter;
+// const VERTICAL_GAP = backgammonBoard.height / 7;
+const VERTICAL_GAP = CHECKER_DIAMETER*1.5;
+const POINT_HEIGHT = MAX_CHKRS_SHOWN * CHECKER_DIAMETER;
 
-const barLeftBoundary = checkerDiameter * 6 + gapBetweenCheckers * 7;
-const barRightBoundary = barLeftBoundary + barWidth;
-const barCenter = (barLeftBoundary + barRightBoundary) / 2;
-const boardWidth = barRightBoundary + checkerDiameter * 6 + gapBetweenCheckers * 7;
-const boardHeight = maxCheckersShown * checkerDiameter * 2 + verticalGap;
+const BAR_LEFT = CHECKER_DIAMETER * 6 + GAP_BETWEEN_CHKRS * 7;
+const BAR_RIGHT = BAR_LEFT + BAR_WIDTH;
+const BAR_CENTER = (BAR_LEFT + BAR_RIGHT) / 2;
 
-const playerLeftDieStartPoint = (barRightBoundary + boardWidth - gapBetweenDice) / 2 - dieSize;
-const playerRightDieStartPoint = (barRightBoundary + boardWidth + gapBetweenDice) / 2;
-const opponentLeftDieStartPoint = (barLeftBoundary - gapBetweenDice) / 2 - dieSize;
-const opponentRightDieStartPoint = (barLeftBoundary + gapBetweenDice) / 2;
-const diceVerticalStartPoint = (boardHeight - dieSize) / 2;
+const BOARD_WIDTH = BAR_RIGHT + CHECKER_DIAMETER * 6 + GAP_BETWEEN_CHKRS * 7;
+const BOARD_HEIGHT = MAX_CHKRS_SHOWN * CHECKER_DIAMETER * 2 + VERTICAL_GAP;
+
+const PLAYER_LEFT_DIE_X = (BAR_RIGHT + BOARD_WIDTH - GAP_BETWEEN_DICE) / 2 - DIE_SIZE;
+const PLAYER_RIGHT_DIE_X = (BAR_RIGHT + BOARD_WIDTH + GAP_BETWEEN_DICE) / 2;
+const OPP_LEFT_DIE_X = (BAR_LEFT - GAP_BETWEEN_DICE) / 2 - DIE_SIZE;
+const OPP_RIGHT_DIE_X = (BAR_LEFT + GAP_BETWEEN_DICE) / 2;
+const DICE_Y = (BOARD_HEIGHT - DIE_SIZE) / 2;
 
 
-const buttonWidth = dieSize * 1.5;
-const buttonHeight = dieSize;
-const submitLeft = (barLeftBoundary - gapBetweenDice) / 2 - buttonWidth;
-const clearLeft = (barLeftBoundary + gapBetweenDice) / 2;
-const clearSubmitBottom = (boardHeight - buttonHeight) / 2;
+const BUTTON_WIDTH = DIE_SIZE * 1.5;
+const BUTTON_HEIGHT = DIE_SIZE;
+const SUBMIT_X = (BAR_LEFT - GAP_BETWEEN_DICE) / 2 - BUTTON_WIDTH;
+const CLEAR_X = (BAR_LEFT + GAP_BETWEEN_DICE) / 2;
+const BUTTON_MID_Y = (BOARD_HEIGHT - BUTTON_HEIGHT) / 2;
 
 // Calculate the center of the cube
-const cubeHorizontal = (boardWidth - doublingCubeSize)/2;
-const cubeCenter = (barRightBoundary + boardWidth) / 2;
+const CUBE_X = (BOARD_WIDTH - DBL_CUBE_SIZE)/2;
+const CUBE_CENTER = (BAR_RIGHT + BOARD_WIDTH) / 2;
 
-const acceptHorizontal = cubeCenter + doublingCubeSize/2 + doublingCubeOffset;
-const rejectHorizontal = cubeCenter - doublingCubeSize/2 - doublingCubeOffset - buttonWidth;
+const ACCEPT_X = CUBE_CENTER + DBL_CUBE_SIZE/2 + DBL_CUBE_OFFSET;
+const REJECT_X = CUBE_CENTER - DBL_CUBE_SIZE/2 - DBL_CUBE_OFFSET - BUTTON_WIDTH;
 
 // under my rightmost checker
-const resignWidth = checkerDiameter;
-const resignHeight = checkerDiameter;
-const resignLeft = barRightBoundary + 5*(checkerDiameter + gapBetweenCheckers) + resignWidth/2;
-const resignBottom = boardHeight + resignHeight + gapBetweenCheckers;
+const RESIGN_WIDTH = CHECKER_DIAMETER;
+const RESIGN_HEIGHT = CHECKER_DIAMETER;
+const RESIGN_X = BAR_RIGHT + 5*(CHECKER_DIAMETER + GAP_BETWEEN_CHKRS) + RESIGN_WIDTH/2;
+const RESIGN_Y = BOARD_HEIGHT + RESIGN_HEIGHT + GAP_BETWEEN_CHKRS;
+
+const FONT_SIZE = (CHECKER_DIAMETER/3.3).toString();
+const FONT_SIZE_SMALL = (CHECKER_DIAMETER/5).toString();
+
+const FONT = FONT_SIZE+'px sans-serif';
+const FONT_SMALL = FONT_SIZE_SMALL+'px sans-serif';
 
 
 const playerColor = 'purple';
@@ -124,9 +131,9 @@ function drawCheckers(ctx, numCheckers, pointStart, direction) {
 
   let checkerCenterVertical;
   if (direction == 1) { // top of board
-    checkerCenterVertical = checkerDiameter / 2;
+    checkerCenterVertical = CHECKER_DIAMETER / 2;
   } else {
-    checkerCenterVertical = boardHeight - checkerDiameter / 2;
+    checkerCenterVertical = BOARD_HEIGHT - CHECKER_DIAMETER / 2;
   }
 
   if (numCheckers > 0) {
@@ -135,19 +142,19 @@ function drawCheckers(ctx, numCheckers, pointStart, direction) {
     ctx.fillStyle = opponentColor;
   }
 
-  for (let i = 0; i < Math.min(Math.abs(numCheckers), maxCheckersShown); i++) {
+  for (let i = 0; i < Math.min(Math.abs(numCheckers), MAX_CHKRS_SHOWN); i++) {
     ctx.beginPath();
-    ctx.arc(pointStart + checkerDiameter / 2, checkerCenterVertical, checkerDiameter / 2, 0, 2 * Math.PI);
+    ctx.arc(pointStart + CHECKER_DIAMETER / 2, checkerCenterVertical, CHECKER_DIAMETER / 2, 0, 2 * Math.PI);
     ctx.fill();
 
-    checkerCenterVertical += (direction * checkerDiameter);
+    checkerCenterVertical += (direction * CHECKER_DIAMETER);
   }
 
-  if (Math.abs(numCheckers) > maxCheckersShown) {
-    ctx.font = '14px sans-serif'; // scale fonts?
+  if (Math.abs(numCheckers) > MAX_CHKRS_SHOWN) {
+    ctx.font = FONT;
     ctx.fillStyle = 'white';
     const text = Math.abs(numCheckers);
-    ctx.fillText(text, pointStart + checkerDiameter / 2 - ctx.measureText(text).width / 2, checkerCenterVertical - direction * checkerDiameter + 2);
+    ctx.fillText(text, pointStart + CHECKER_DIAMETER / 2 - ctx.measureText(text).width / 2, checkerCenterVertical - direction * CHECKER_DIAMETER + 2);
   }
 
   ctx.fillStyle = 'grey';
@@ -164,20 +171,20 @@ function drawBarCheckers(ctx, numCheckers, direction) {
     ctx.fillStyle = opponentColor;
   }
 
-  let checkerCenterVertical = boardHeight / 2 + direction * (gapBetweenCheckers + (checkerDiameter+doublingCubeSize) / 2);
-  for (let i = 0; i < Math.min(Math.abs(numCheckers), maxBarCheckersShown); i++) {
+  let checkerCenterVertical = BOARD_HEIGHT / 2 + direction * (GAP_BETWEEN_CHKRS + (CHECKER_DIAMETER+DBL_CUBE_SIZE) / 2);
+  for (let i = 0; i < Math.min(Math.abs(numCheckers), MAX_BAR_CHKRS_SHOWN); i++) {
     ctx.beginPath();
-    ctx.arc(barCenter, checkerCenterVertical, checkerDiameter / 2, 0, 2 * Math.PI);
+    ctx.arc(BAR_CENTER, checkerCenterVertical, CHECKER_DIAMETER / 2, 0, 2 * Math.PI);
     ctx.fill();
 
-    checkerCenterVertical += (direction * checkerDiameter);
+    checkerCenterVertical += (direction * CHECKER_DIAMETER);
   }
 
-  if (Math.abs(numCheckers) > maxBarCheckersShown) {
-    ctx.font = '14px sans-serif';
+  if (Math.abs(numCheckers) > MAX_BAR_CHKRS_SHOWN) {
+    ctx.font = FONT;
     ctx.fillStyle = 'white';
     const text = Math.abs(numCheckers);
-    ctx.fillText(Math.abs(numCheckers), barCenter - ctx.measureText(text).width / 2, checkerCenterVertical - direction * checkerDiameter + 2);
+    ctx.fillText(Math.abs(numCheckers), BAR_CENTER - ctx.measureText(text).width / 2, checkerCenterVertical - direction * CHECKER_DIAMETER + 2);
   }
 
   ctx.fillStyle = 'grey';
@@ -189,13 +196,13 @@ function drawPoints(boardState) {
   let pointStart = 5;
   let bottom = false;
   for (let i = 0; i < 25; i++) {
-    if (i == 0 || i == 12) pointStart = gapBetweenCheckers;
+    if (i == 0 || i == 12) pointStart = GAP_BETWEEN_CHKRS;
     if (i>=12) bottom = true;
-    if (i == 6 || i == 18) pointStart+=(barWidth + gapBetweenCheckers);
+    if (i == 6 || i == 18) pointStart+=(BAR_WIDTH + GAP_BETWEEN_CHKRS);
     ctx.beginPath();
-    ctx.moveTo(pointStart, bottom ? boardHeight : 0);
-    ctx.lineTo(pointStart + checkerDiameter / 2, bottom ? boardHeight - pointHeight : pointHeight);
-    ctx.lineTo(pointStart + checkerDiameter, bottom ? boardHeight : 0);
+    ctx.moveTo(pointStart, bottom ? BOARD_HEIGHT : 0);
+    ctx.lineTo(pointStart + CHECKER_DIAMETER / 2, bottom ? BOARD_HEIGHT - POINT_HEIGHT : POINT_HEIGHT);
+    ctx.lineTo(pointStart + CHECKER_DIAMETER, bottom ? BOARD_HEIGHT : 0);
     if (bottom ^ i % 2 == 0) {
       ctx.stroke();
     } else {
@@ -206,45 +213,67 @@ function drawPoints(boardState) {
       else if (i >= 12 && i <= 24) drawCheckers(ctx, boardState.board[i-11], pointStart, bottom ? -1 : 1);
     }
 
-    pointStart += (checkerDiameter + gapBetweenCheckers);
+    pointStart += (CHECKER_DIAMETER + GAP_BETWEEN_CHKRS);
   }
 }
 
 function drawButton(buttonX, buttonY, buttonText, buttonColor = 'lightgray', textColor= 'black') {
   ctx.fillStyle = buttonColor;
-  ctx.fillRect(buttonX, buttonY, buttonWidth, buttonHeight);
+  ctx.fillRect(buttonX, buttonY, BUTTON_WIDTH, BUTTON_HEIGHT);
   ctx.fillStyle = textColor;
-  ctx.font = '14px sans-serif';
-  ctx.fillText(buttonText, buttonX + buttonWidth / 2 - ctx.measureText(buttonText).width / 2, buttonY + buttonHeight / 2 + 4);
+  ctx.font = FONT;
+  ctx.fillText(buttonText, buttonX + BUTTON_WIDTH / 2 - ctx.measureText(buttonText).width / 2, buttonY + BUTTON_HEIGHT / 2 + 4);
 }
 
 function drawText(x, y, maxWidth, lineHeight, text) {
-  function getLines(context, text, maxWidth) {
-    const words = text.split(' ');
-    const lines = [];
-    let currentLine = words[0];
+    ctx.fillStyle = 'black';
+    ctx.font = FONT;
+    
+    function getLines(context, text, maxWidth) {
+        const words = text.split(' ');
+        const lines = [];
+        let currentLine = words[0];
 
-    for (let i = 1; i < words.length; i++) {
-      const word = words[i];
-      const width = context.measureText(currentLine + ' ' + word).width;
-      if (width < maxWidth) {
-        currentLine += ' ' + word;
-      } else {
+        for (let i = 1; i < words.length; i++) {
+            const word = words[i];
+            const width = context.measureText(currentLine + ' ' + word).width;
+            if (width < maxWidth) {
+                currentLine += ' ' + word;
+            } else {
+                lines.push(currentLine);
+                currentLine = word;
+            }
+        }
         lines.push(currentLine);
-        currentLine = word;
-      }
+        return lines;
     }
-    lines.push(currentLine);
-    return lines;
-  }
 
-  const lines = getLines(ctx, text, maxWidth);
-  y = y - (lines.length-1)*lineHeight/2;
-  for (let i = 0; i < lines.length; i++) {
-    const x = boardWidth/2 - ctx.measureText(lines[i]).width / 2;
-    ctx.fillText(lines[i], x, y + i*lineHeight);
-  }
+    const lines = getLines(ctx, text, maxWidth);
+    y = y - (lines.length-1)*lineHeight/2;
+
+    // Calculate the maximum line width and total height
+    let maxLineWidth = 0;
+    let totalHeight = lines.length * lineHeight;
+
+    lines.forEach(line => {
+        const lineWidth = ctx.measureText(line).width;
+        if (lineWidth > maxLineWidth) {
+            maxLineWidth = lineWidth;
+        }
+    });
+
+    // Draw the rectangle behind the text
+    ctx.fillStyle = 'rgba(255, 255, 0, 0.5)';  // set the color and opacity of the rectangle
+    ctx.fillRect(x - maxLineWidth / 2 - 10, y - totalHeight/2, maxLineWidth + 20, totalHeight + 20);
+
+    // Draw the text
+    ctx.fillStyle = 'black';
+    for (let i = 0; i < lines.length; i++) {
+        const x = BOARD_WIDTH/2 - ctx.measureText(lines[i]).width / 2;
+        ctx.fillText(lines[i], x, y + i*lineHeight);
+    }
 }
+
 
 
 function drawBoard(boardState) {
@@ -260,13 +289,13 @@ function drawBoard(boardState) {
 
   // draw outer boundary of board
   ctx.beginPath();
-  ctx.rect(1, 0, boardWidth, boardHeight);
+  ctx.rect(1, 0, BOARD_WIDTH, BOARD_HEIGHT);
 
   // draw bar
-  ctx.moveTo(barLeftBoundary, 0);
-  ctx.lineTo(barLeftBoundary, boardHeight);
-  ctx.moveTo(barRightBoundary, 0);
-  ctx.lineTo(barRightBoundary, boardHeight);
+  ctx.moveTo(BAR_LEFT, 0);
+  ctx.lineTo(BAR_LEFT, BOARD_HEIGHT);
+  ctx.moveTo(BAR_RIGHT, 0);
+  ctx.lineTo(BAR_RIGHT, BOARD_HEIGHT);
 
   ctx.stroke();
 
@@ -274,10 +303,10 @@ function drawBoard(boardState) {
 
   if (!boardState) {
     const text = 'Click anywhere to begin. Click anywhere to roll. Click on the checkers to move them. Moves will be made in the order the dice are shown. Invert the dice by clicking on them. After making a move submit it, or if you don\'t like it you can clear it';
-    const x = boardWidth/2;
-    const y = boardHeight / 2 + 4;
+    const x = BOARD_WIDTH/2;
+    const y = BOARD_HEIGHT / 2 + 4;
     const maxWidth = backgammonBoard.width; // The maximum width of a line, leaving some margin
-    const lineHeight = 20;
+    const lineHeight = FONT_SIZE;
 
     drawText(x, y, maxWidth, lineHeight, text);
     return;
@@ -295,8 +324,8 @@ function drawBoard(boardState) {
   }
 
   if (boardState.turn == 1 && boardState.dice.length !== 0) {
-    drawButton(clearLeft, clearSubmitBottom, 'clear');
-    drawButton(submitLeft, clearSubmitBottom, 'submit');
+    drawButton(CLEAR_X, BUTTON_MID_Y, 'clear');
+    drawButton(SUBMIT_X, BUTTON_MID_Y, 'submit');
   }
 
   if (!boardState.crawford) {
@@ -305,36 +334,36 @@ function drawBoard(boardState) {
     let cubeValueToShow;
     if (boardState.wasDoubled) {
       cubeValueToShow = boardState.cubeValue * 2;
-      cubeVertical = (boardHeight - doublingCubeSize) / 2;
+      cubeVertical = (BOARD_HEIGHT - DBL_CUBE_SIZE) / 2;
       if (boardState.wasDoubled > 0) { // opponent doubled player
       } else { // player doubled opponent
-        drawButton(acceptHorizontal, cubeVertical, 'accept', 'green');
-        drawButton(rejectHorizontal, cubeVertical, 'reject', 'red');
+        drawButton(ACCEPT_X, cubeVertical, 'accept', 'green');
+        drawButton(REJECT_X, cubeVertical, 'reject', 'red');
       }
     } else {
       cubeValueToShow = boardState.cubeValue;
       if (boardState.iMayDouble && boardState.opponentMayDouble) { // centered cube
-        cubeVertical = (boardHeight - doublingCubeSize) / 2;
+        cubeVertical = (BOARD_HEIGHT - DBL_CUBE_SIZE) / 2;
       } else if (boardState.iMayDouble) {
-        cubeVertical = boardHeight - doublingCubeSize - doublingCubeOffset;
+        cubeVertical = BOARD_HEIGHT - DBL_CUBE_SIZE - DBL_CUBE_OFFSET;
       } else if (boardState.opponentMayDouble) {
-        cubeVertical = doublingCubeOffset;
+        cubeVertical = DBL_CUBE_OFFSET;
       }
     }
-    ctx.strokeRect(cubeHorizontal, cubeVertical, doublingCubeSize, doublingCubeSize);
-    ctx.font = '14px sans-serif';
+    ctx.strokeRect(CUBE_X, cubeVertical, DBL_CUBE_SIZE, DBL_CUBE_SIZE);
+    ctx.font = FONT;
     ctx.fillStyle = 'black';
-    ctx.fillText(cubeValueToShow, cubeHorizontal + (doublingCubeSize - ctx.measureText(cubeValueToShow).width) / 2, cubeVertical + doublingCubeSize / 2 + 4);
+    ctx.fillText(cubeValueToShow, CUBE_X + (DBL_CUBE_SIZE - ctx.measureText(cubeValueToShow).width) / 2, cubeVertical + DBL_CUBE_SIZE / 2 + 4);
   }
 
   // dont draw pieces off for now
 
   //   if (boardState.myPiecesOff > 0) {
   //     ctx.fillStyle = playerColor;
-  //     var checkerOffHorizontal = boardWidth + doublingCubeOffset + doublingCubeSize / 2;
-  //     var checkerOffVertical = boardHeight - doublingCubeSize - gapBetweenCheckers - checkerDiameter / 2;
+  //     var checkerOffHorizontal = BOARD_WIDTH + DBL_CUBE_OFFSET + DBL_CUBE_SIZE / 2;
+  //     var checkerOffVertical = BOARD_HEIGHT - DBL_CUBE_SIZE - GAP_BETWEEN_CHKRS - CHECKER_DIAMETER / 2;
   //     ctx.beginPath();
-  //     ctx.arc(checkerOffHorizontal, checkerOffVertical, checkerDiameter / 2, 0, 2 * Math.PI);
+  //     ctx.arc(checkerOffHorizontal, checkerOffVertical, CHECKER_DIAMETER / 2, 0, 2 * Math.PI);
   //     ctx.fill();
   //     ctx.fillStyle = 'white';
   //     ctx.font = '14px sans-serif';
@@ -343,10 +372,10 @@ function drawBoard(boardState) {
 
   //   if (boardState.opponentPiecesOff > 0) {
   //     ctx.fillStyle = opponentColor;
-  //     var checkerOffHorizontal = boardWidth + doublingCubeOffset + doublingCubeSize / 2;
-  //     var checkerOffVertical = 2 + doublingCubeSize + gapBetweenCheckers + checkerDiameter / 2;
+  //     var checkerOffHorizontal = BOARD_WIDTH + DBL_CUBE_OFFSET + DBL_CUBE_SIZE / 2;
+  //     var checkerOffVertical = 2 + DBL_CUBE_SIZE + GAP_BETWEEN_CHKRS + CHECKER_DIAMETER / 2;
   //     ctx.beginPath();
-  //     ctx.arc(checkerOffHorizontal, checkerOffVertical, checkerDiameter / 2, 0, 2 * Math.PI);
+  //     ctx.arc(checkerOffHorizontal, checkerOffVertical, CHECKER_DIAMETER / 2, 0, 2 * Math.PI);
   //     ctx.fill();
   //     ctx.fillStyle = 'white';
   //     ctx.font = '14px sans-serif';
@@ -355,33 +384,33 @@ function drawBoard(boardState) {
 
   ctx.beginPath();
   ctx.strokeStyle = 'black';
-  ctx.moveTo(resignLeft, resignBottom - resignHeight); // start drawing the pole from the bottom of the flag
-  ctx.lineTo(resignLeft, resignBottom); // draw the pole up to the top of the flag
+  ctx.moveTo(RESIGN_X, RESIGN_Y - RESIGN_HEIGHT); // start drawing the pole from the bottom of the flag
+  ctx.lineTo(RESIGN_X, RESIGN_Y); // draw the pole up to the top of the flag
   ctx.stroke();
-  ctx.strokeRect(resignLeft, resignBottom - resignHeight, resignFlagSize, resignFlagSize); // draw the flag above the pole
+  ctx.strokeRect(RESIGN_X, RESIGN_Y - RESIGN_HEIGHT, FLAG_SIZE, FLAG_SIZE); // draw the flag above the pole
   ctx.fillStyle = 'black';
-  ctx.font = '14px sans-serif';
-  ctx.fillText('resign', resignLeft + resignFlagSize / 2 - ctx.measureText('resign').width / 2, resignBottom - resignHeight + resignFlagSize / 2 + 4); // place the text at the center of the flag
+  ctx.font = FONT_SMALL;
+  ctx.fillText('resign', RESIGN_X + FLAG_SIZE / 2 - ctx.measureText('resign').width / 2, RESIGN_Y - RESIGN_HEIGHT + FLAG_SIZE / 2 + FONT_SIZE_SMALL/3); // place the text at the center of the flag
 
   if (boardState.resignationOffered) {
     let resignationFlagHorizontal;
     if (boardState.turn == 1) { // player offered resignation to opponent
-      resignationFlagHorizontal = (barLeftBoundary - resignFlagPoleHeight/2) / 2;
+      resignationFlagHorizontal = (BAR_LEFT - FLAG_POLE_HEIGHT/2) / 2;
     } else { // opponent offered resignation to player
-      resignationFlagHorizontal = (barRightBoundary + boardWidth -resignFlagPoleHeight/2) / 2;
-      drawButton(acceptHorizontal, cubeVertical, 'accept', 'green');
-      drawButton(rejectHorizontal, cubeVertical, 'reject', 'red');
+      resignationFlagHorizontal = (BAR_RIGHT + BOARD_WIDTH -FLAG_POLE_HEIGHT/2) / 2;
+      drawButton(ACCEPT_X, cubeVertical, 'accept', 'green');
+      drawButton(REJECT_X, cubeVertical, 'reject', 'red');
     }
 
     ctx.beginPath();
     ctx.strokeStyle = 'black';
-    ctx.moveTo(resignationFlagHorizontal, (boardHeight - resignFlagPoleHeight) / 2);
-    ctx.lineTo(resignationFlagHorizontal, (boardHeight + resignFlagPoleHeight) / 2);
+    ctx.moveTo(resignationFlagHorizontal, (BOARD_HEIGHT - FLAG_POLE_HEIGHT) / 2);
+    ctx.lineTo(resignationFlagHorizontal, (BOARD_HEIGHT + FLAG_POLE_HEIGHT) / 2);
     ctx.stroke();
-    ctx.strokeRect(resignationFlagHorizontal, (boardHeight - resignFlagPoleHeight) / 2, resignFlagSize, resignFlagSize);
+    ctx.strokeRect(resignationFlagHorizontal, (BOARD_HEIGHT - FLAG_POLE_HEIGHT) / 2, FLAG_SIZE, FLAG_SIZE);
     ctx.fillStyle = 'black';
-    ctx.font = '14px sans-serif';
-    ctx.fillText(boardState.resignationValue, resignationFlagHorizontal + resignFlagSize / 2 - ctx.measureText(boardState.resignationValue).width / 2, (boardHeight - resignFlagPoleHeight + resignFlagSize) / 2 + 4);
+    ctx.font = FONT;
+    ctx.fillText(boardState.resignationValue, resignationFlagHorizontal + FLAG_SIZE / 2 - ctx.measureText(boardState.resignationValue).width / 2, (BOARD_HEIGHT - FLAG_POLE_HEIGHT + FLAG_SIZE) / 2 + 4);
   }
 }
 
@@ -399,9 +428,9 @@ function drawDieCenterDot(ctx, dieStartPoint) {
   ctx.fillStyle = 'white';
   ctx.beginPath();
   ctx.arc(
-      intermediatePoint(dieStartPoint, dieStartPoint + dieSize, 0.5),
-      intermediatePoint(diceVerticalStartPoint, diceVerticalStartPoint + dieSize, 0.5),
-      dieDotRadius, 0, 2 * Math.PI);
+      intermediatePoint(dieStartPoint, dieStartPoint + DIE_SIZE, 0.5),
+      intermediatePoint(DICE_Y, DICE_Y + DIE_SIZE, 0.5),
+      DIE_DOT_RADIUS, 0, 2 * Math.PI);
   ctx.fill();
 }
 
@@ -416,13 +445,13 @@ function drawDieMainDiagonalDots(ctx, dieStartPoint) {
   ctx.fillStyle = 'white';
   ctx.beginPath();
   ctx.arc(
-      intermediatePoint(dieStartPoint, dieStartPoint + dieSize, 0.25),
-      intermediatePoint(diceVerticalStartPoint, diceVerticalStartPoint + dieSize, 0.25),
-      dieDotRadius, 0, 2 * Math.PI);
+      intermediatePoint(dieStartPoint, dieStartPoint + DIE_SIZE, 0.25),
+      intermediatePoint(DICE_Y, DICE_Y + DIE_SIZE, 0.25),
+      DIE_DOT_RADIUS, 0, 2 * Math.PI);
   ctx.arc(
-      intermediatePoint(dieStartPoint, dieStartPoint + dieSize, 0.75),
-      intermediatePoint(diceVerticalStartPoint, diceVerticalStartPoint + dieSize, 0.75),
-      dieDotRadius, 0, 2 * Math.PI);
+      intermediatePoint(dieStartPoint, dieStartPoint + DIE_SIZE, 0.75),
+      intermediatePoint(DICE_Y, DICE_Y + DIE_SIZE, 0.75),
+      DIE_DOT_RADIUS, 0, 2 * Math.PI);
   ctx.fill();
 }
 
@@ -437,13 +466,13 @@ function drawDieAntiDiagonalDots(ctx, dieStartPoint) {
   ctx.fillStyle = 'white';
   ctx.beginPath();
   ctx.arc(
-      intermediatePoint(dieStartPoint, dieStartPoint + dieSize, 0.75),
-      intermediatePoint(diceVerticalStartPoint, diceVerticalStartPoint + dieSize, 0.25),
-      dieDotRadius, 0, 2 * Math.PI);
+      intermediatePoint(dieStartPoint, dieStartPoint + DIE_SIZE, 0.75),
+      intermediatePoint(DICE_Y, DICE_Y + DIE_SIZE, 0.25),
+      DIE_DOT_RADIUS, 0, 2 * Math.PI);
   ctx.arc(
-      intermediatePoint(dieStartPoint, dieStartPoint + dieSize, 0.25),
-      intermediatePoint(diceVerticalStartPoint, diceVerticalStartPoint + dieSize, 0.75),
-      dieDotRadius, 0, 2 * Math.PI);
+      intermediatePoint(dieStartPoint, dieStartPoint + DIE_SIZE, 0.25),
+      intermediatePoint(DICE_Y, DICE_Y + DIE_SIZE, 0.75),
+      DIE_DOT_RADIUS, 0, 2 * Math.PI);
   ctx.fill();
 }
 
@@ -458,20 +487,20 @@ function drawDieMiddleDots(ctx, dieStartPoint) {
   ctx.fillStyle = 'white';
   ctx.beginPath();
   ctx.arc(
-      intermediatePoint(dieStartPoint, dieStartPoint + dieSize, 0.25),
-      intermediatePoint(diceVerticalStartPoint, diceVerticalStartPoint + dieSize, 0.5),
-      dieDotRadius, 0, 2 * Math.PI);
+      intermediatePoint(dieStartPoint, dieStartPoint + DIE_SIZE, 0.25),
+      intermediatePoint(DICE_Y, DICE_Y + DIE_SIZE, 0.5),
+      DIE_DOT_RADIUS, 0, 2 * Math.PI);
   ctx.arc(
-      intermediatePoint(dieStartPoint, dieStartPoint + dieSize, 0.75),
-      intermediatePoint(diceVerticalStartPoint, diceVerticalStartPoint + dieSize, 0.5),
-      dieDotRadius, 0, 2 * Math.PI);
+      intermediatePoint(dieStartPoint, dieStartPoint + DIE_SIZE, 0.75),
+      intermediatePoint(DICE_Y, DICE_Y + DIE_SIZE, 0.5),
+      DIE_DOT_RADIUS, 0, 2 * Math.PI);
   ctx.fill();
 }
 
 
 function drawDie(ctx, dieStartPoint, color, dieValue) {
   ctx.fillStyle = color;
-  ctx.fillRect(dieStartPoint, diceVerticalStartPoint, dieSize, dieSize);
+  ctx.fillRect(dieStartPoint, DICE_Y, DIE_SIZE, DIE_SIZE);
   switch (dieValue) {
     case 1:
       drawDieCenterDot(ctx, dieStartPoint);
@@ -507,12 +536,12 @@ function drawDice(ctx, n1, n2, turn) {
   let color; let leftDieStartPoint; let rightDieStartPoint;
   if (turn == 1) {
     color = playerColor;
-    leftDieStartPoint = playerLeftDieStartPoint;
-    rightDieStartPoint = playerRightDieStartPoint;
+    leftDieStartPoint = PLAYER_LEFT_DIE_X;
+    rightDieStartPoint = PLAYER_RIGHT_DIE_X;
   } else {
     color = opponentColor;
-    leftDieStartPoint = opponentLeftDieStartPoint;
-    rightDieStartPoint = opponentRightDieStartPoint;
+    leftDieStartPoint = OPP_LEFT_DIE_X;
+    rightDieStartPoint = OPP_RIGHT_DIE_X;
   }
 
   drawDie(ctx, leftDieStartPoint, color, n1);
@@ -545,20 +574,17 @@ backgammonBoard.onclick = function(ev) {
   } = ev;
 
   if (!currentState.board) {
-    gnubgCommand('set player 0 chequerplay type evaluation');
-    gnubgCommand('set player 0 chequerplay evaluation plies 3');
-    gnubgCommand('set player 0 chequerplay evaluation prune on');
     newGame();
     return;
   } else if (currentState.dice.length === 0 || currentState.resignationOffered) {
     if (currentState.wasDoubled || currentState.resignationOffered) {
-      const cubeVertical = (boardHeight - doublingCubeSize) / 2;
-      if (isWithinArea(x, y, acceptHorizontal, cubeVertical, buttonWidth, buttonHeight)) {
+      const cubeVertical = (BOARD_HEIGHT - DBL_CUBE_SIZE) / 2;
+      if (isWithinArea(x, y, ACCEPT_X, cubeVertical, BUTTON_WIDTH, BUTTON_HEIGHT)) {
         gnubgCommand('accept');
         return;
       }
 
-      if (isWithinArea(x, y, rejectHorizontal, cubeVertical, buttonWidth, buttonHeight)) {
+      if (isWithinArea(x, y, REJECT_X, cubeVertical, BUTTON_WIDTH, BUTTON_HEIGHT)) {
         gnubgCommand('reject');
         return;
       }
@@ -567,11 +593,11 @@ backgammonBoard.onclick = function(ev) {
     if (currentState.iMayDouble && currentState.turn == 1) {
       let cubeVertical;
       if (currentState.opponentMayDouble) { // centered cube
-        cubeVertical = (boardHeight - doublingCubeSize) / 2;
+        cubeVertical = (BOARD_HEIGHT - DBL_CUBE_SIZE) / 2;
       } else {
-        cubeVertical = boardHeight - doublingCubeSize;
+        cubeVertical = BOARD_HEIGHT - DBL_CUBE_SIZE;
       }
-      if (isWithinArea(x, y, cubeHorizontal, cubeVertical, doublingCubeSize, doublingCubeSize)) {
+      if (isWithinArea(x, y, CUBE_X, cubeVertical, DBL_CUBE_SIZE, DBL_CUBE_SIZE)) {
         gnubgCommand('double');
         return;
       }
@@ -583,19 +609,19 @@ backgammonBoard.onclick = function(ev) {
   }
 
   // Touch dice to invert them
-  if (isWithinArea(x, y, playerLeftDieStartPoint, diceVerticalStartPoint, playerRightDieStartPoint - playerLeftDieStartPoint + dieSize, dieSize)) {
+  if (isWithinArea(x, y, PLAYER_LEFT_DIE_X, DICE_Y, PLAYER_RIGHT_DIE_X - PLAYER_LEFT_DIE_X + DIE_SIZE, DIE_SIZE)) {
     handleDiceInversion();
     return;
   }
 
   // Clear
-  if (isWithinArea(x, y, clearLeft, clearSubmitBottom, buttonWidth, buttonHeight)) {
+  if (isWithinArea(x, y, CLEAR_X, BUTTON_MID_Y, BUTTON_WIDTH, BUTTON_HEIGHT)) {
     handleClearButtonPress();
     return;
   }
 
   // Submit
-  if (isWithinArea(x, y, submitLeft, clearSubmitBottom, buttonWidth, buttonHeight)) {
+  if (isWithinArea(x, y, SUBMIT_X, BUTTON_MID_Y, BUTTON_WIDTH, BUTTON_HEIGHT)) {
     handleSubmitButtonPress();
     return;
   }
@@ -603,13 +629,13 @@ backgammonBoard.onclick = function(ev) {
   // Perform logic based on the click coordinates
   if (currentState.turn == 1) {
   // Submit
-    if (isWithinArea(x, y, resignLeft, resignBottom - resignHeight, resignWidth, resignHeight)) {
+    if (isWithinArea(x, y, RESIGN_X, RESIGN_Y - RESIGN_HEIGHT, RESIGN_WIDTH, RESIGN_HEIGHT)) {
       handleResignButtonPress();
       return;
     }
 
     // Check if click is within bar area
-    if (isWithinArea(x, y, barLeftBoundary, 0, barWidth, boardHeight)) {
+    if (isWithinArea(x, y, BAR_LEFT, 0, BAR_WIDTH, BOARD_HEIGHT)) {
       handleBarAreaClick();
     } else {
       handleBoardAreaClick(x, y);
@@ -685,16 +711,16 @@ function handleBoardAreaClick(x, y) {
 }
 
 function adjustCoordinatesIfBeyondBoundary(x) {
-  if (x > barRightBoundary) {
-    x -= (barRightBoundary - barLeftBoundary);
+  if (x > BAR_RIGHT) {
+    x -= (BAR_RIGHT - BAR_LEFT);
   }
   return x;
 }
 
 function calculatePoint(x, y) {
-  let point = Math.floor(x / (checkerDiameter + gapBetweenCheckers)) + 1;
+  let point = Math.floor(x / (CHECKER_DIAMETER + GAP_BETWEEN_CHKRS)) + 1;
   if (point > 12) point = 0;
-  if (y < boardHeight / 2) {
+  if (y < BOARD_HEIGHT / 2) {
     point = 25 - point;
   }
   return point;
@@ -810,17 +836,15 @@ function parseState(rawBoard) {
   };
 }
 
-resignationOfferPending = false;
-resignationValue = 0;
+let resignationOfferPending = false;
+let resignationValue = 0;
 function updateBoard(rawBoard) {
   if (resignationOfferPending) { // Ignore board update immediately after resignation offer, since nothing has changed and we don't want to remove the "Accept or reject the resignation" message
     resignationOfferPending = false;
     resignationValue = 0;
     return;
   }
-  let resignationOffered = false;
   if (rawBoard.includes('offers to resign')) {
-    resignationOffered = true;
     resignationOfferPending = true;
     if (rawBoard.endsWith('a single game.')) {
       resignationValue = 1;

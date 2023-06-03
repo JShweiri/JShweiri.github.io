@@ -106,15 +106,6 @@ function roll() {
   gnubgCommand('roll');
 }
 
-function move8(a1, a2, b1, b2, c1, c2, d1, d2) {
-  let moveStr = '';
-  moveStr += (a2 !== undefined ? `${a1}/${a2}` : '');
-  moveStr += (b2 !== undefined ? ` ${b1}/${b2}` : '');
-  moveStr += (c2 !== undefined ? ` ${c1}/${c2}` : '');
-  moveStr += (d2 !== undefined ? ` ${d1}/${d2}` : '');
-  gnubgCommand(moveStr);
-}
-
 function double() {
   gnubgCommand('double');
 }
