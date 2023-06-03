@@ -6,7 +6,7 @@ var ctx = backgammonBoard.getContext('2d');
 // separate into files
 // 3 files? playLocal, training, online... move shared stuff to separate file (common)
 
-//add prev and next buttons next to resign
+// add prev and next buttons next to resign
 
 // make single move, switch dice, make other move.. glitch
 
@@ -185,8 +185,70 @@ function drawBarCheckers(ctx, numCheckers, direction) {
 
 dontDraw = false;
 
+function drawPoints(boardState) {
+  let pointStart = 5;
+  let bottom = false;
+  for (let i = 0; i < 25; i++) {
+    if (i == 0 || i == 12) pointStart = gapBetweenCheckers;
+    if (i>=12) bottom = true;
+    if (i == 6 || i == 18) pointStart+=(barWidth + gapBetweenCheckers);
+    ctx.beginPath();
+    ctx.moveTo(pointStart, bottom ? boardHeight : 0);
+    ctx.lineTo(pointStart + checkerDiameter / 2, bottom ? boardHeight - pointHeight : pointHeight);
+    ctx.lineTo(pointStart + checkerDiameter, bottom ? boardHeight : 0);
+    if (bottom ^ i % 2 == 0) {
+      ctx.stroke();
+    } else {
+      ctx.fill();
+    }
+    if (boardState) {
+      if (!bottom) drawCheckers(ctx, boardState.board[24 - i], pointStart, bottom ? -1 : 1);
+      else if (i >= 12 && i <= 24) drawCheckers(ctx, boardState.board[i-11], pointStart, bottom ? -1 : 1);
+    }
+
+    pointStart += (checkerDiameter + gapBetweenCheckers);
+  }
+}
+
+function drawButton(buttonX, buttonY, buttonText, buttonColor = 'lightgray', textColor= 'black') {
+  ctx.fillStyle = buttonColor;
+  ctx.fillRect(buttonX, buttonY, buttonWidth, buttonHeight);
+  ctx.fillStyle = textColor;
+  ctx.font = '14px sans-serif';
+  ctx.fillText(buttonText, buttonX + buttonWidth / 2 - ctx.measureText(buttonText).width / 2, buttonY + buttonHeight / 2 + 4);
+}
+
+function drawText(x, y, maxWidth, lineHeight, text) {
+  function getLines(context, text, maxWidth) {
+    const words = text.split(' ');
+    const lines = [];
+    let currentLine = words[0];
+
+    for (let i = 1; i < words.length; i++) {
+      const word = words[i];
+      const width = context.measureText(currentLine + ' ' + word).width;
+      if (width < maxWidth) {
+        currentLine += ' ' + word;
+      } else {
+        lines.push(currentLine);
+        currentLine = word;
+      }
+    }
+    lines.push(currentLine);
+    return lines;
+  }
+
+  const lines = getLines(ctx, text, maxWidth);
+  y = y - (lines.length-1)*lineHeight/2;
+  for (let i = 0; i < lines.length; i++) {
+    const x = boardWidth/2 - ctx.measureText(lines[i]).width / 2;
+    ctx.fillText(lines[i], x, y + i*lineHeight);
+  }
+}
+
+
 function drawBoard(boardState) {
-    if(dontDraw) return;
+  if (dontDraw) return;
   console.log(boardState);
   ctx.strokeStyle = 'black';
   ctx.fillStyle = 'grey';
@@ -208,129 +270,16 @@ function drawBoard(boardState) {
 
   ctx.stroke();
 
-  // draw upper left points
-  var pointStart = gapBetweenCheckers;
-  for (var i = 0; i < 6; i++) {
-    ctx.beginPath();
-    ctx.moveTo(pointStart, 0);
-    ctx.lineTo(pointStart + checkerDiameter / 2, pointHeight);
-    ctx.lineTo(pointStart + checkerDiameter, 0);
-    if (i % 2 == 0) {
-      ctx.stroke();
-    } else {
-      ctx.fill();
-    }
-    if (boardState) {
-      drawCheckers(ctx, boardState.board[24 - i], pointStart, 1);
-    }
-
-    pointStart += (checkerDiameter + gapBetweenCheckers);
-  }
-
-  // draw upper right points
-  pointStart += (barWidth + gapBetweenCheckers);
-  for (var i = 0; i < 6; i++) {
-    ctx.beginPath();
-    ctx.moveTo(pointStart, 0);
-    ctx.lineTo(pointStart + checkerDiameter / 2, pointHeight);
-    ctx.lineTo(pointStart + checkerDiameter, 0);
-    if (i % 2 == 0) {
-      ctx.stroke();
-    } else {
-      ctx.fill();
-    }
-    if (boardState) {
-      drawCheckers(ctx, boardState.board[18 - i], pointStart, 1);
-    }
-
-    pointStart += (checkerDiameter + gapBetweenCheckers);
-  }
-
-
-  // draw lower left points
-  var pointStart = gapBetweenCheckers;
-  for (var i = 0; i < 6; i++) {
-    ctx.beginPath();
-    ctx.moveTo(pointStart, boardHeight);
-    ctx.lineTo(pointStart + checkerDiameter / 2, boardHeight - pointHeight);
-    ctx.lineTo(pointStart + checkerDiameter, boardHeight);
-    if (i % 2 == 1) {
-      ctx.stroke();
-    } else {
-      ctx.fill();
-    }
-    if (boardState) {
-      drawCheckers(ctx, boardState.board[i + 1], pointStart, -1);
-    }
-    pointStart += (checkerDiameter + gapBetweenCheckers);
-  }
-
-  // draw lower right points
-  pointStart += (barWidth + gapBetweenCheckers);
-  for (var i = 0; i < 6; i++) {
-    ctx.beginPath();
-    ctx.moveTo(pointStart, boardHeight);
-    ctx.lineTo(pointStart + checkerDiameter / 2, boardHeight - pointHeight);
-    ctx.lineTo(pointStart + checkerDiameter, boardHeight);
-    if (i % 2 == 1) {
-      ctx.stroke();
-    } else {
-      ctx.fill();
-    }
-    if (boardState) {
-      drawCheckers(ctx, boardState.board[i + 7], pointStart, -1);
-    }
-
-    pointStart += (checkerDiameter + gapBetweenCheckers);
-  }
+  drawPoints(boardState);
 
   if (!boardState) {
-    ctx.fillStyle = 'black';
-    ctx.font = '16px sans-serif';
     const text = 'Click anywhere to begin. Click anywhere to roll. Click on the checkers to move them. Moves will be made in the order the dice are shown. Invert the dice by clicking on them. After making a move submit it, or if you don\'t like it you can clear it';
+    const x = boardWidth/2;
+    const y = boardHeight / 2 + 4;
+    const maxWidth = backgammonBoard.width; // The maximum width of a line, leaving some margin
+    const lineHeight = 20;
 
-var x = boardWidth/2;
-var y = boardHeight / 2 + 4;
-var maxWidth = backgammonBoard.width; // The maximum width of a line, leaving some margin
-var lineHeight = 20;
-
-function getLines(context, text, maxWidth) {
-    var words = text.split(' ');
-    var lines = [];
-    var currentLine = words[0];
-
-    for (var i = 1; i < words.length; i++) {
-        var word = words[i];
-        var width = context.measureText(currentLine + " " + word).width;
-        if (width < maxWidth) {
-            currentLine += " " + word;
-        } else {
-            lines.push(currentLine);
-            currentLine = word;
-        }
-    }
-    lines.push(currentLine);
-    return lines;
-}
-
-var lines = getLines(ctx, text, maxWidth);
-y = y - (lines.length-1)*lineHeight/2;
-for (var i = 0; i < lines.length; i++) {
-    const x = boardWidth/2 - ctx.measureText(lines[i]).width / 2;
-    ctx.fillText(lines[i], x, y + i*lineHeight);
-}
-
-
-
-
-
-
-
-
-
-
-
-
+    drawText(x, y, maxWidth, lineHeight, text);
     return;
   }
 
@@ -346,13 +295,8 @@ for (var i = 0; i < lines.length; i++) {
   }
 
   if (boardState.turn == 1 && boardState.dice.length !== 0) {
-    ctx.fillStyle = 'lightgray';
-    ctx.fillRect(clearLeft, clearSubmitBottom, buttonWidth, buttonHeight);
-    ctx.fillRect(submitLeft, clearSubmitBottom, buttonWidth, buttonHeight);
-    ctx.fillStyle = 'black';
-    ctx.font = '14px sans-serif';
-    ctx.fillText('clear', clearLeft + buttonWidth / 2 - ctx.measureText('clear').width / 2, clearSubmitBottom + buttonHeight / 2 + 4);
-    ctx.fillText('submit', submitLeft + buttonWidth / 2 - ctx.measureText('submit').width / 2, clearSubmitBottom + buttonHeight / 2 + 4);
+    drawButton(clearLeft, clearSubmitBottom, 'clear');
+    drawButton(submitLeft, clearSubmitBottom, 'submit');
   }
 
   if (!boardState.crawford) {
@@ -364,25 +308,8 @@ for (var i = 0; i < lines.length; i++) {
       cubeVertical = (boardHeight - doublingCubeSize) / 2;
       if (boardState.wasDoubled > 0) { // opponent doubled player
       } else { // player doubled opponent
-        ctx.fillStyle = 'green';
-        ctx.fillRect(acceptHorizontal, cubeVertical, buttonWidth, buttonHeight);
-        ctx.font = '14px sans-serif';
-        ctx.fillStyle = 'black';
-        const text = 'accept';
-        const textSize = ctx.measureText(text);
-        const textX = acceptHorizontal + (buttonWidth - textSize.width) / 2;
-        const textY = cubeVertical + (buttonHeight + 14) / 2; // 14 is the font size
-        ctx.fillText(text, textX, textY - 2);
-
-        ctx.fillStyle = 'red'; // or any color you want for the "reject" button
-        ctx.fillRect(rejectHorizontal, cubeVertical, buttonWidth, buttonHeight);
-        ctx.font = '14px sans-serif';
-        ctx.fillStyle = 'black';
-        const text2 = 'reject';
-        const textSize2 = ctx.measureText(text2);
-        const textX2 = rejectHorizontal + (buttonWidth - textSize2.width) / 2;
-        const textY2 = cubeVertical + (buttonHeight + 14) / 2; // 14 is the font size
-        ctx.fillText(text2, textX2, textY2 - 2);
+        drawButton(acceptHorizontal, cubeVertical, 'accept', 'green');
+        drawButton(rejectHorizontal, cubeVertical, 'reject', 'red');
       }
     } else {
       cubeValueToShow = boardState.cubeValue;
@@ -442,26 +369,8 @@ for (var i = 0; i < lines.length; i++) {
       resignationFlagHorizontal = (barLeftBoundary - resignFlagPoleHeight/2) / 2;
     } else { // opponent offered resignation to player
       resignationFlagHorizontal = (barRightBoundary + boardWidth -resignFlagPoleHeight/2) / 2;
-
-      ctx.fillStyle = 'green';
-      ctx.fillRect(acceptHorizontal, (boardHeight - buttonHeight)/2, buttonWidth, buttonHeight);
-      ctx.font = '14px sans-serif';
-      ctx.fillStyle = 'black';
-      const text = 'accept';
-      const textSize = ctx.measureText(text);
-      const textX = acceptHorizontal + (buttonWidth - textSize.width) / 2;
-      const textY = (boardHeight - buttonHeight)/2 + (buttonHeight + 14) / 2; // 14 is the font size
-      ctx.fillText(text, textX, textY - 2);
-
-      ctx.fillStyle = 'red'; // or any color you want for the "reject" button
-      ctx.fillRect(rejectHorizontal, (boardHeight - buttonHeight)/2, buttonWidth, buttonHeight);
-      ctx.font = '14px sans-serif';
-      ctx.fillStyle = 'black';
-      const text2 = 'reject';
-      const textSize2 = ctx.measureText(text2);
-      const textX2 = rejectHorizontal + (buttonWidth - textSize2.width) / 2;
-      const textY2 = (boardHeight - buttonHeight)/2 + (buttonHeight + 14) / 2; // 14 is the font size
-      ctx.fillText(text2, textX2, textY2 - 2);
+      drawButton(acceptHorizontal, cubeVertical, 'accept', 'green');
+      drawButton(rejectHorizontal, cubeVertical, 'reject', 'red');
     }
 
     ctx.beginPath();
@@ -628,7 +537,7 @@ window.addEventListener('load', function() {
 let moves = [];
 
 backgammonBoard.onclick = function(ev) {
-    if(dontDraw) return;
+  if (dontDraw) return;
 
   const {
     offsetX: x,
@@ -641,71 +550,63 @@ backgammonBoard.onclick = function(ev) {
   } else if (currentState.dice.length === 0 || currentState.resignationOffered) {
     if (currentState.wasDoubled || currentState.resignationOffered) {
       const cubeVertical = (boardHeight - doublingCubeSize) / 2;
-      if (x >= acceptHorizontal && x <= acceptHorizontal + buttonWidth &&
-        y >= cubeVertical && y <= cubeVertical + buttonHeight) {
+      if (isWithinArea(x, y, acceptHorizontal, cubeVertical, buttonWidth, buttonHeight)) {
         gnubgCommand('accept');
         return;
       }
 
-      if (x >= rejectHorizontal && x <= rejectHorizontal + buttonWidth &&
-        y >= cubeVertical && y <= cubeVertical + buttonHeight) {
+      if (isWithinArea(x, y, rejectHorizontal, cubeVertical, buttonWidth, buttonHeight)) {
         gnubgCommand('reject');
         return;
       }
     }
 
     if (currentState.iMayDouble && currentState.turn == 1) {
+      let cubeVertical;
       if (currentState.opponentMayDouble) { // centered cube
-        if (x >= cubeHorizontal && x <= cubeHorizontal + doublingCubeSize &&
-                y >= (boardHeight - doublingCubeSize) / 2 && y <= (boardHeight - doublingCubeSize) / 2 + doublingCubeSize) {
-          gnubgCommand('double');
-          return;
-        }
+        cubeVertical = (boardHeight - doublingCubeSize) / 2;
       } else {
-        if (x >= cubeHorizontal && x <= cubeHorizontal + doublingCubeSize &&
-                y >= boardHeight - doublingCubeSize && y <= boardHeight) {
-          gnubgCommand('double');
-          return;
-        }
+        cubeVertical = boardHeight - doublingCubeSize;
+      }
+      if (isWithinArea(x, y, cubeHorizontal, cubeVertical, doublingCubeSize, doublingCubeSize)) {
+        gnubgCommand('double');
+        return;
       }
     }
+
 
     roll();
     return;
   }
 
   // Touch dice to invert them
-  if (isInDiceArea(x, y)) {
+  if (isWithinArea(x, y, playerLeftDieStartPoint, diceVerticalStartPoint, playerRightDieStartPoint - playerLeftDieStartPoint + dieSize, dieSize)) {
     handleDiceInversion();
     return;
   }
 
   // Clear
-  if (isInClearButtonArea(x, y)) {
+  if (isWithinArea(x, y, clearLeft, clearSubmitBottom, buttonWidth, buttonHeight)) {
     handleClearButtonPress();
     return;
   }
 
   // Submit
-  if (isInSubmitButtonArea(x, y)) {
+  if (isWithinArea(x, y, submitLeft, clearSubmitBottom, buttonWidth, buttonHeight)) {
     handleSubmitButtonPress();
     return;
   }
 
   // Perform logic based on the click coordinates
   if (currentState.turn == 1) {
-    // Submit
-    if (isInResignButtonArea(x, y)) {
-      let resignAmount = 'a';
-      while (isNaN(resignAmount) || (resignAmount > 3)) {
-        resignAmount = parseInt(window.prompt('How many points would you like to resign (1, 2, 3)?'));
-      }
-      console.log('resign ' + resignAmount);
-      gnubgCommand('resign ' + resignAmount);
+  // Submit
+    if (isWithinArea(x, y, resignLeft, resignBottom - resignHeight, resignWidth, resignHeight)) {
+      handleResignButtonPress();
       return;
     }
 
-    if (isInBarArea(x)) {
+    // Check if click is within bar area
+    if (isWithinArea(x, y, barLeftBoundary, 0, barWidth, boardHeight)) {
       handleBarAreaClick();
     } else {
       handleBoardAreaClick(x, y);
@@ -718,17 +619,22 @@ backgammonBoard.onclick = function(ev) {
   console.log(moves);
 };
 
-function isInDiceArea(x, y) {
-  return x >= playerLeftDieStartPoint && x <= playerRightDieStartPoint + dieSize && y >= diceVerticalStartPoint && y < diceVerticalStartPoint + dieSize;
+// A function to check if x and y fall within a defined area
+function isWithinArea(x, y, areaStartX, areaStartY, areaWidth, areaHeight) {
+  return x >= areaStartX && x <= areaStartX + areaWidth && y >= areaStartY && y <= areaStartY + areaHeight;
+}
+
+function handleResignButtonPress() {
+  let resignAmount = 'a';
+  while (isNaN(resignAmount) || (resignAmount > 3)) {
+    resignAmount = parseInt(window.prompt('How many points would you like to resign (1, 2, 3)?'));
+  }
+  gnubgCommand('resign ' + resignAmount);
 }
 
 function handleDiceInversion() {
   currentState.dice = currentState.dice.reverse();
   drawBoard(currentState);
-}
-
-function isInClearButtonArea(x, y) {
-  return x >= clearLeft && x <= clearLeft + buttonWidth && y >= clearSubmitBottom && y < clearSubmitBottom + buttonHeight;
 }
 
 function handleClearButtonPress() {
@@ -738,21 +644,9 @@ function handleClearButtonPress() {
   drawBoard(currentState);
 }
 
-function isInSubmitButtonArea(x, y) {
-  return x >= submitLeft && x <= submitLeft + buttonWidth && y >= clearSubmitBottom && y < clearSubmitBottom + buttonHeight;
-}
-
-function isInResignButtonArea(x, y) {
-  return x >= resignLeft && x <= resignLeft + resignWidth && y >= resignBottom - resignHeight && y < resignBottom;
-}
-
 function handleSubmitButtonPress() {
   gnubgCommand(moves.join(' '));
   moves = [];
-}
-
-function isInBarArea(x) {
-  return x >= barLeftBoundary && x <= barRightBoundary;
 }
 
 function handleBarAreaClick() {
@@ -937,13 +831,12 @@ function updateBoard(rawBoard) {
   }
   lastState = currentState;
   currentState = parseState(rawBoard);
-  console.log(lastState.turn == -1 && currentState.turn == 1);
   if (lastState.turn == -1 && currentState.turn == 1) {
     dontDraw = true;
     window.setTimeout(()=>{
-        dontDraw = false;
-        drawBoard(currentState);
-    }, CPU_DELAY_MS,);
+      dontDraw = false;
+      drawBoard(currentState);
+    }, CPU_DELAY_MS);
   } else {
     drawBoard(currentState);
   }
